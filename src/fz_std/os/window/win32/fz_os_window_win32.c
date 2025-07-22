@@ -3,7 +3,7 @@
 // @Section: Input-Keyboard
 
 // Win32 VK code translation table - MUST match enum order exactly
-static U32 _win32_key_table[Keyboard_Key_Count] = {
+static u32 _win32_key_table[Keyboard_Key_Count] = {
   0x08, // Keyboard_Key_BACKSPACE
   0x0D, // Keyboard_Key_ENTER
   0x09, // Keyboard_Key_TAB
@@ -135,12 +135,12 @@ static U32 _win32_key_table[Keyboard_Key_Count] = {
 };
 
 // Translation functions
-internal U32 _native_key_from_os_key(Keyboard_Key key) {
+internal u32 _native_key_from_os_key(Keyboard_Key key) {
   return _win32_key_table[key];
 }
 
-internal Keyboard_Key _os_key_from_native_key(U32 native_key) {
-  for(U32 i = 0; i < Keyboard_Key_Count; ++i) {
+internal Keyboard_Key _os_key_from_native_key(u32 native_key) {
+  for(u32 i = 0; i < Keyboard_Key_Count; ++i) {
     if(_win32_key_table[i] == native_key) {
       return (Keyboard_Key)i;
     }

@@ -14,12 +14,12 @@
 internal GLuint opengl_compile_program(String8 source_path, GLenum kind);
 internal void   opengl_delete_program(GLuint program);
   
-internal void opengl_set_uniform_mat4fv(U32 program, const U8* uniform, Mat4F32 mat);
-internal void opengl_set_uniform_u32(U32 program, const U8* uniform, U32 value);
-internal void opengl_set_uniform_f32(U32 program, const U8* uniform, F32 value);
+internal void opengl_set_uniform_mat4fv(u32 program, const u8* uniform, Mat4F32 mat);
+internal void opengl_set_uniform_u32(u32 program, const u8* uniform, u32 value);
+internal void opengl_set_uniform_f32(u32 program, const u8* uniform, f32 value);
 
 internal void opengl_enable_debug_messages();
-internal S32  opengl_get_max_textures();
+internal s32  opengl_get_max_textures();
 
 // DOC(fz): Opengl hello world program from https://gist.github.com/mmozeiko/ed2ad27f75edf9c26053ce332a1f6647
 // Requires:
@@ -33,7 +33,7 @@ internal void opengl_fatal_error(char* message, ...);
 // TODO(fz): Clean these up
 
 internal void opengl_load_fallback_texture(GLuint* texture) {
-  U32 pixels[] = {
+  u32 pixels[] = {
     0x80000000, 0xffffffff,
     0xffffffff, 0x80000000,
   };
@@ -44,8 +44,8 @@ internal void opengl_load_fallback_texture(GLuint* texture) {
   glTextureParameteri(*texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTextureParameteri(*texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  S32 width = 2;
-  S32 height = 2;
+  s32 width = 2;
+  s32 height = 2;
   glTextureStorage2D(*texture, 1, GL_RGBA8, width, height);
   glTextureSubImage2D(*texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }

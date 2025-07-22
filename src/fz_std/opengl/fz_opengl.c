@@ -5,7 +5,7 @@ internal GLuint opengl_compile_program(String8 source_path, GLenum kind) {
   // Load shader source
   File_Data shader_source = file_load(scratch.arena, source_path);
   if (shader_source.data.size == 0) {
-    ERROR_MESSAGE_AND_EXIT("Failed to load shader file: %.*s", (S32)source_path.size, source_path.str);
+    ERROR_MESSAGE_AND_EXIT("Failed to load shader file: %.*s", (s32)source_path.size, source_path.str);
   }
   
   printf("\n------------\n");
@@ -15,7 +15,7 @@ internal GLuint opengl_compile_program(String8 source_path, GLenum kind) {
   // Create and compile shader
   
   // Create separable shader program
-  U8 *null_terminated_source = ArenaPush(scratch.arena, char, shader_source.data.size + 1);
+  u8 *null_terminated_source = ArenaPush(scratch.arena, char, shader_source.data.size + 1);
   MemoryCopy(null_terminated_source, shader_source.data.str, shader_source.data.size);
   null_terminated_source[shader_source.data.size] = 0;
 
@@ -28,23 +28,23 @@ internal GLuint opengl_compile_program(String8 source_path, GLenum kind) {
   glGetProgramiv(program, GL_LINK_STATUS, &success);
   if (!success) {
     GLchar info_log[1024];
-    glGetProgramInfoLog(program, sizeof(info_log), NULL, info_log);
-    ERROR_MESSAGE_AND_EXIT("Shader link failed for %.*s: %s", (S32)source_path.size, source_path.str, info_log);
+    glGetProgramInfoLog(program, sizeof(info_log), null, info_log);
+    ERROR_MESSAGE_AND_EXIT("Shader link failed for %.*s: %s", (s32)source_path.size, source_path.str, info_log);
   }
   
   scratch_end(&scratch);
   return program;
 }
 
-internal void opengl_set_uniform_mat4fv(U32 program, const U8* uniform, Mat4F32 mat) {
-  S32 uniform_location = glGetUniformLocation(program, uniform);
+internal void opengl_set_uniform_mat4fv(u32 program, const u8* uniform, Mat4F32 mat) {
+  s32 uniform_location = glGetUniformLocation(program, uniform);
   if (uniform_location == -1) {
     printf("Mat4F32 :: Uniform %s not found for program %d\n", uniform, program);
   }
   glUniformMatrix4fv(uniform_location, 1, 1, &mat.data[0][0]);
 }
 
-internal void opengl_set_uniform_u32(U32 program, const U8* uniform, U32 value) {
+internal void opengl_set_uniform_u32(u32 program, const u8* uniform, u32 value) {
   GLint uniform_location = glGetUniformLocation(program, uniform);
   if (uniform_location == -1) {
     printf("u32 :: Uniform %s not found for program %d\n", uniform, program);
@@ -52,7 +52,7 @@ internal void opengl_set_uniform_u32(U32 program, const U8* uniform, U32 value) 
   glUniform1ui(uniform_location, value);
 }
 
-internal void opengl_set_uniform_f32(U32 program, const U8* uniform, F32 value) {
+internal void opengl_set_uniform_f32(u32 program, const u8* uniform, f32 value) {
   GLint uniform_location = glGetUniformLocation(program, uniform);
   if (uniform_location == -1) {
     printf("f32 :: Uniform %s not found for program %d\n", uniform, program);
@@ -64,8 +64,8 @@ internal void opengl_delete_program(GLuint program) {
   glDeleteProgram(program);
 }
 
-internal S32 opengl_get_max_textures() {
-  S32 max_gpu_textures;
+internal s32 opengl_get_max_textures() {
+  s32 max_gpu_textures;
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_gpu_textures);
   return max_gpu_textures;
 }
@@ -75,7 +75,7 @@ internal void opengl_fatal_error(char* message, ...) {
   va_start(argptr, message);
   vfprintf(stderr, message, argptr);
   va_end(argptr);
-  MessageBoxA(NULL, message, "Error", MB_ICONEXCLAMATION);
+  MessageBoxA(null, message, "Error", MB_ICONEXCLAMATION);
   ExitProcess(0);
 }
 
@@ -195,7 +195,7 @@ internal void opengl_hello_world(HWND window, HDC device_context) {
     if (!linked)
     {
       char message[1024];
-      glGetProgramInfoLog(vshader, sizeof(message), NULL, message);
+      glGetProgramInfoLog(vshader, sizeof(message), null, message);
       OutputDebugStringA(message);
       Assert(!"Failed to create vertex shader!");
     }
@@ -204,7 +204,7 @@ internal void opengl_hello_world(HWND window, HDC device_context) {
     if (!linked)
     {
       char message[1024];
-      glGetProgramInfoLog(fshader, sizeof(message), NULL, message);
+      glGetProgramInfoLog(fshader, sizeof(message), null, message);
       OutputDebugStringA(message);
       Assert(!"Failed to create fragment shader!");
     }
@@ -240,7 +240,7 @@ internal void opengl_hello_world(HWND window, HDC device_context) {
   {
     // process all incoming Windows messages
     MSG msg;
-    if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    if (PeekMessageW(&msg, null, 0, 0, PM_REMOVE))
     {
       if (msg.message == WM_QUIT)
       {
@@ -254,8 +254,8 @@ internal void opengl_hello_world(HWND window, HDC device_context) {
     // get current window client area size
     RECT rect;
     GetClientRect(window, &rect);
-    S32 width  = rect.right - rect.left;
-    S32 height = rect.bottom - rect.top;
+    s32 width  = rect.right - rect.left;
+    s32 height = rect.bottom - rect.top;
 
     LARGE_INTEGER c2;
     QueryPerformanceCounter(&c2);

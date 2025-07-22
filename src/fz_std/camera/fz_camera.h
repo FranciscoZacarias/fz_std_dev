@@ -27,19 +27,19 @@ typedef enum Camera_Movement {
 typedef struct Camera {
   Vec3F32 position;
   QuatF32 orientation;
-  F32 fov;
-  F32 speed;
-  F32 sensitivity;
+  f32 fov;
+  f32 speed;
+  f32 sensitivity;
   Camera_Mode mode;
 } Camera;
 
-internal void    camera_init(Camera* camera, Vec3F32 position, Vec3F32 look_at, F32 speed, F32 sensitivity);
-internal void    camera_update(Camera* camera, F32 delta_time);
+internal void    camera_init(Camera* camera, Vec3F32 position, Vec3F32 look_at, f32 speed, f32 sensitivity);
+internal void    camera_update(Camera* camera, f32 delta_time);
 internal Vec3F32 camera_get_forward(Camera* camera);
 internal Vec3F32 camera_get_right(Camera* camera);
 internal Vec3F32 camera_get_up(Camera* camera);
 internal Mat4F32 camera_get_view_matrix(Camera* camera);
 internal void    camera_look_at(Camera* camera, Vec3F32 target);
-internal void    camera_set_euler(Camera* camera, F32 pitch, F32 yaw, F32 roll);
+internal void    camera_set_euler(Camera* camera, f32 pitch, f32 yaw, f32 roll);
 
 #endif // FZ_CAMERA_H

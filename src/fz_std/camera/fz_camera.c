@@ -1,4 +1,4 @@
-internal void camera_init(Camera* camera, Vec3F32 position, Vec3F32 look_at, F32 speed, F32 sensitivity) {
+internal void camera_init(Camera* camera, Vec3F32 position, Vec3F32 look_at, f32 speed, f32 sensitivity) {
   AssertNoReentry();
     
   camera->position    = vec3f32(0.0f, 0.0f, 5.0f);
@@ -9,8 +9,8 @@ internal void camera_init(Camera* camera, Vec3F32 position, Vec3F32 look_at, F32
   camera->mode        = CameraMode_Select;
 }
 
-internal void camera_update(Camera* camera, F32 delta_time) {
-  local_persist B32 was_right_mouse_button_down = 0;
+internal void camera_update(Camera* camera, f32 delta_time) {
+  local_persist b32 was_right_mouse_button_down = 0;
 
   if (input_is_button_down(MouseButton_Right)) {
     if (!was_right_mouse_button_down) {
@@ -23,7 +23,7 @@ internal void camera_update(Camera* camera, F32 delta_time) {
 
     camera->mode = CameraMode_Fly;
 
-    F32 camera_speed = (F32)(camera->speed * delta_time);
+    f32 camera_speed = (f32)(camera->speed * delta_time);
 
     Vec3F32 forward = camera_get_forward(camera);
     Vec3F32 right   = camera_get_right(camera);
@@ -37,14 +37,14 @@ internal void camera_update(Camera* camera, F32 delta_time) {
     if (input_is_key_down(KeyboardKey_Q)) camera->position = vec3f32_sub(camera->position, vec3f32_scale(up, camera_speed));
 
     // Mouse look
-    F32 sensitivity = 0.0015f;
+    f32 sensitivity = 0.0015f;
     sensitivity *= camera->sensitivity;
 
-    F32 dx = _InputState.mouse_current.delta_x;
-    F32 dy = _InputState.mouse_current.delta_y;
+    f32 dx = _InputState.mouse_current.delta_x;
+    f32 dy = _InputState.mouse_current.delta_y;
 
-    F32 yaw   = -dx * sensitivity;
-    F32 pitch = -dy * sensitivity;
+    f32 yaw   = -dx * sensitivity;
+    f32 pitch = -dy * sensitivity;
 
     QuatF32 yaw_rotation   = quatf32_from_axis_angle((Vec3F32){0.0f, 1.0f, 0.0f}, yaw);
     Vec3F32 camera_right   = camera_get_right(camera);
@@ -60,8 +60,8 @@ internal void camera_update(Camera* camera, F32 delta_time) {
     SetCursorPos(center.x, center.y);
 
     // Manually set current mouse position to center (so next frame delta is correct)
-    _InputState.mouse_current.screen_space_x = (F32)((rect.right - rect.left) / 2);
-    _InputState.mouse_current.screen_space_y = (F32)((rect.bottom - rect.top) / 2);
+    _InputState.mouse_current.screen_space_x = (f32)((rect.right - rect.left) / 2);
+    _InputState.mouse_current.screen_space_y = (f32)((rect.bottom - rect.top) / 2);
   } else {
     camera->mode = CameraMode_Select;
     was_right_mouse_button_down = 0;
@@ -102,6 +102,6 @@ internal void camera_look_at(Camera* camera, Vec3F32 target) {
   camera->orientation = quatf32_from_vec3f32_to_vec3f32(forward, direction);
 }
 
-internal void camera_set_euler(Camera* camera, F32 pitch, F32 yaw, F32 roll) {
+internal void camera_set_euler(Camera* camera, f32 pitch, f32 yaw, f32 roll) {
   camera->orientation = quatf32_from_euler(pitch, yaw, roll);
 }

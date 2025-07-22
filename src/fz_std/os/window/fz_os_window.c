@@ -18,69 +18,69 @@ void _input_update() {
 }
 
 //~ Keyboard functions
-internal B32 input_is_key_up(Keyboard_Key key) {
-  B32 result = _InputState.keyboard_current.keys[key] == false;
+internal b32 input_is_key_up(Keyboard_Key key) {
+  b32 result = _InputState.keyboard_current.keys[key] == false;
   return result;
 }
 
-internal B32 input_is_key_down(Keyboard_Key key) {
-  B32 result = _InputState.keyboard_current.keys[key] == true;
+internal b32 input_is_key_down(Keyboard_Key key) {
+  b32 result = _InputState.keyboard_current.keys[key] == true;
   return result;
 }
 
-internal B32 input_was_key_up(Keyboard_Key key) {
-  B32 result = _InputState.keyboard_previous.keys[key] == false;
+internal b32 input_was_key_up(Keyboard_Key key) {
+  b32 result = _InputState.keyboard_previous.keys[key] == false;
   return result;
 }
 
-internal B32 input_was_key_down(Keyboard_Key key) {
-  B32 result = _InputState.keyboard_previous.keys[key] == true;
+internal b32 input_was_key_down(Keyboard_Key key) {
+  b32 result = _InputState.keyboard_previous.keys[key] == true;
   return result;
 }
 
-internal B32 input_is_key_pressed(Keyboard_Key key) {
+internal b32 input_is_key_pressed(Keyboard_Key key) {
   return input_is_key_down(key) && input_was_key_up(key);
 }
 
-internal void _input_process_keyboard_key(Keyboard_Key key, B8 is_pressed) {
+internal void _input_process_keyboard_key(Keyboard_Key key, b8 is_pressed) {
   if (_InputState.keyboard_current.keys[key] != is_pressed) {
     _InputState.keyboard_current.keys[key] = is_pressed;
   }
 }
 
 //~ Mouse functions
-internal B32 input_is_button_up(Mouse_Button button) {
-  B32 result = _InputState.mouse_current.buttons[button] == false;
+internal b32 input_is_button_up(Mouse_Button button) {
+  b32 result = _InputState.mouse_current.buttons[button] == false;
   return result;
 }
 
-internal B32 input_is_button_down(Mouse_Button button) {
-  B32 result = _InputState.mouse_current.buttons[button] == true;
+internal b32 input_is_button_down(Mouse_Button button) {
+  b32 result = _InputState.mouse_current.buttons[button] == true;
   return result;
 }
 
-internal B32 input_was_button_up(Mouse_Button button) {
-  B32 result = _InputState.mouse_previous.buttons[button] == false;
+internal b32 input_was_button_up(Mouse_Button button) {
+  b32 result = _InputState.mouse_previous.buttons[button] == false;
   return result;
 }
 
-internal B32 input_was_button_down(Mouse_Button button) {
-  B32 result = _InputState.mouse_previous.buttons[button] == true;
+internal b32 input_was_button_down(Mouse_Button button) {
+  b32 result = _InputState.mouse_previous.buttons[button] == true;
   return result;
 }
 
-internal B32 input_is_button_pressed(Mouse_Button button) {
-  B32 result = input_is_button_down(button) && input_was_button_up(button);
+internal b32 input_is_button_pressed(Mouse_Button button) {
+  b32 result = input_is_button_down(button) && input_was_button_up(button);
   return result;
 }
 
-internal void _input_process_mouse_button(Mouse_Button button, B32 is_pressed) {
-  if (_InputState.mouse_current.buttons[button] != (B8)is_pressed) {
-    _InputState.mouse_current.buttons[button] = (B8)is_pressed;
+internal void _input_process_mouse_button(Mouse_Button button, b32 is_pressed) {
+  if (_InputState.mouse_current.buttons[button] != (b8)is_pressed) {
+    _InputState.mouse_current.buttons[button] = (b8)is_pressed;
   }
 }
 
-internal void _input_process_mouse_cursor(S32 x, S32 y) {
+internal void _input_process_mouse_cursor(s32 x, s32 y) {
   // Copy current state to previous
   MemoryCopyStruct(&(_InputState.mouse_previous), &(_InputState.mouse_current));
 

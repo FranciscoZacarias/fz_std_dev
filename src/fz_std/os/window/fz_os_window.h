@@ -6,25 +6,25 @@ internal OS_Handle os_window_open(Range2F32 rect, String8 title); /* Creates and
 internal void      os_window_close(OS_Handle window);             /* Closes and destroys a window */
 
 // @Section: Window State
-internal B32  os_window_is_focused(OS_Handle window);     /* Returns true if window is focused */
+internal b32  os_window_is_focused(OS_Handle window);     /* Returns true if window is focused */
 internal void os_window_focus(OS_Handle window);          /* Tries to focus the window */
 internal void os_window_first_paint(OS_Handle window);    /* Forces first WM_PAINT */
 internal void os_window_bring_to_front(OS_Handle window); /* Moves window to front */
 
 // @Section: Window Flags
-internal B32  os_window_is_fullscreen(OS_Handle window);         /* True if fullscreen */
-internal void os_window_set_fullscreen(OS_Handle window, B32);   /* Enables/disables fullscreen */
-internal B32  os_window_is_maximized(OS_Handle window);          /* True if maximized */
-internal void os_window_set_maximized(OS_Handle window, B32);    /* Maximizes/restores window */
-internal B32  os_window_is_minimized(OS_Handle window);          /* True if minimized */
-internal void os_window_set_minimized(OS_Handle window, B32);    /* Minimizes/restores window */
+internal b32  os_window_is_fullscreen(OS_Handle window);         /* True if fullscreen */
+internal void os_window_set_fullscreen(OS_Handle window, b32);   /* Enables/disables fullscreen */
+internal b32  os_window_is_maximized(OS_Handle window);          /* True if maximized */
+internal void os_window_set_maximized(OS_Handle window, b32);    /* Maximizes/restores window */
+internal b32  os_window_is_minimized(OS_Handle window);          /* True if minimized */
+internal void os_window_set_minimized(OS_Handle window, b32);    /* Minimizes/restores window */
 
 // @Section: Window Appearance
-internal void os_window_set_visible(OS_Handle window, B32 visible);                          /* Show or hide the window */
-internal B32  os_window_set_title(OS_Handle window, String8 title);                          /* Sets window title */
+internal void os_window_set_visible(OS_Handle window, b32 visible);                          /* Show or hide the window */
+internal b32  os_window_set_title(OS_Handle window, String8 title);                          /* Sets window title */
 internal void os_window_clear_custom_border_data(OS_Handle window);                          /* Resets border override (Windows only) */
-internal void os_window_push_custom_title_bar(OS_Handle window, F32 thickness);              /* Define title bar area */
-internal void os_window_push_custom_edges(OS_Handle window, F32 thickness);                  /* Define draggable edges */
+internal void os_window_push_custom_title_bar(OS_Handle window, f32 thickness);              /* Define title bar area */
+internal void os_window_push_custom_edges(OS_Handle window, f32 thickness);                  /* Define draggable edges */
 internal void os_window_push_custom_title_bar_client_area(OS_Handle window, Range2F32 rect); /* Client title bar rect */
 internal void os_window_set_position(OS_Handle window, Vec2F32 pos);                         /* Set window top-left position */
 internal void os_window_set_size(OS_Handle window, Vec2F32 size);                            /* Set client size (non-fullscreen) */
@@ -33,21 +33,21 @@ internal void os_window_set_size(OS_Handle window, Vec2F32 size);               
 internal Range2F32 os_rect_from_window(OS_Handle window);                      /* Returns outer window rectangle */
 internal Range2F32 os_client_rect_from_window(OS_Handle window);               /* Returns client area rectangle */
 internal void      os_window_set_monitor(OS_Handle window, OS_Handle monitor); /* Moves window to monitor */
-internal F32       os_dpi_from_window(OS_Handle window);                       /* DPI scale factor for the current window */
+internal f32       os_dpi_from_window(OS_Handle window);                       /* DPI scale factor for the current window */
 
 // @Section: Monitor
 typedef struct OS_Monitor_Info {
   Range2F32 rect;      /* Physical monitor bounds in pixels */
   Range2F32 work_rect; /* Usable area (excludes taskbar/docks) */
-  F32       dpi_scale; /* Scaling factor for monitor */
+  f32       dpi_scale; /* Scaling factor for monitor */
 } OS_Monitor_Info;
 
-internal U32             os_get_monitor_count();                   /* Number of active monitors */
-internal OS_Handle       os_get_monitor_handle(U32 index);         /* Get monitor handle */
+internal u32             os_get_monitor_count();                   /* Number of active monitors */
+internal OS_Handle       os_get_monitor_handle(u32 index);         /* Get monitor handle */
 internal OS_Handle       os_get_primary_monitor();                 /* Get primary monitor */
 internal OS_Handle       os_monitor_from_window(OS_Handle window); /* Monitor containing window */
 internal OS_Monitor_Info os_get_monitor_info(OS_Handle monitor);   /* Info for monitor */
-internal F32             os_dpi_from_monitor(OS_Handle monitor);   /* DPI scale factor for a given monitor */
+internal f32             os_dpi_from_monitor(OS_Handle monitor);   /* DPI scale factor for a given monitor */
 
 // @Section: Cursor
 typedef enum Cursor_Type {
@@ -62,9 +62,9 @@ typedef enum Cursor_Type {
 } Cursor_Type;
 
 internal void os_cursor_set(Cursor_Type cursor);    /* Sets system cursor type */
-internal void os_cursor_set_position(S32 x, S32 y); /* Moves cursor to screen coordinates */
-internal void os_cursor_lock(B32 lock);             /* Locks/unlocks cursor to center */
-internal void os_cursor_hide(B32 hide);             /* Hides/shows the cursor */
+internal void os_cursor_set_position(s32 x, s32 y); /* Moves cursor to screen coordinates */
+internal void os_cursor_lock(b32 lock);             /* Locks/unlocks cursor to center */
+internal void os_cursor_hide(b32 hide);             /* Hides/shows the cursor */
 
 // @Section: Input
 typedef enum Keyboard_Key {
@@ -200,8 +200,8 @@ typedef enum Keyboard_Key {
   Keyboard_Key_Count,
 } Keyboard_Key;
 
-internal U32          _native_key_from_os_key(Keyboard_Key key); /* Converts os key to native key */
-internal Keyboard_Key _os_key_from_native_key(U32 native_key);   /* Converts native key to os key */
+internal u32          _native_key_from_os_key(Keyboard_Key key); /* Converts os key to native key */
+internal Keyboard_Key _os_key_from_native_key(u32 native_key);   /* Converts native key to os key */
 
 typedef enum Mouse_Button {
   MouseButton_Left,
@@ -213,25 +213,25 @@ typedef enum Mouse_Button {
 
 #define KEYBOARD_STATE_SIZE 256
 typedef struct Keyboard_State {
-  B8 keys[KEYBOARD_STATE_SIZE];
+  b8 keys[KEYBOARD_STATE_SIZE];
 } Keyboard_State;
 
 typedef struct Mouse_State {
   union {
     struct {
-      F32 screen_space_x;
-      F32 screen_space_y;
+      f32 screen_space_x;
+      f32 screen_space_y;
     };
     Vec2F32 screen_space;
   };
   union {
     struct {
-      F32 delta_x;
-      F32 delta_y;
+      f32 delta_x;
+      f32 delta_y;
     };
     Vec2F32 delta;
   };
-  B8 buttons[MouseButton_Count];
+  b8 buttons[MouseButton_Count];
 } Mouse_State;
 
 typedef struct Input_State {
@@ -247,22 +247,22 @@ internal void _input_init();   /* Initializes input state (clears previous + cur
 internal void _input_update(); /* Updates previous input state with current state (to track deltas and transitions) */
 
 // Keyboard keys
-internal B32 input_is_key_up(Keyboard_Key key);      /* True if the given key is currently up */
-internal B32 input_is_key_down(Keyboard_Key key);    /* True if the given key is currently down */
-internal B32 input_was_key_up(Keyboard_Key key);     /* True if the given key was up on the previous frame */
-internal B32 input_was_key_down(Keyboard_Key key);   /* True if the given key was down on the previous frame */
-internal B32 input_is_key_pressed(Keyboard_Key key); /* True if the given key is down this frame but was up last frame */
+internal b32 input_is_key_up(Keyboard_Key key);      /* True if the given key is currently up */
+internal b32 input_is_key_down(Keyboard_Key key);    /* True if the given key is currently down */
+internal b32 input_was_key_up(Keyboard_Key key);     /* True if the given key was up on the previous frame */
+internal b32 input_was_key_down(Keyboard_Key key);   /* True if the given key was down on the previous frame */
+internal b32 input_is_key_pressed(Keyboard_Key key); /* True if the given key is down this frame but was up last frame */
 
 // Mouse keys
-internal B32 input_is_button_up(Mouse_Button button);      /* True if the given mouse button is currently up */
-internal B32 input_is_button_down(Mouse_Button button);    /* True if the given mouse button is currently down */
-internal B32 input_was_button_up(Mouse_Button button);     /* True if the given mouse button was up on the previous frame */
-internal B32 input_was_button_down(Mouse_Button button);   /* True if the given mouse button was down on the previous frame */
-internal B32 input_is_button_pressed(Mouse_Button button); /* True if the given mouse button is down this frame but was up last frame */
+internal b32 input_is_button_up(Mouse_Button button);      /* True if the given mouse button is currently up */
+internal b32 input_is_button_down(Mouse_Button button);    /* True if the given mouse button is currently down */
+internal b32 input_was_button_up(Mouse_Button button);     /* True if the given mouse button was up on the previous frame */
+internal b32 input_was_button_down(Mouse_Button button);   /* True if the given mouse button was down on the previous frame */
+internal b32 input_is_button_pressed(Mouse_Button button); /* True if the given mouse button is down this frame but was up last frame */
 
 // Processing
-internal void _input_process_keyboard_key(Keyboard_Key key, B8 is_pressed);     /* Internal: Processes a key press/release and updates keyboard state */
-internal void _input_process_mouse_button(Mouse_Button button, B32 is_pressed); /* Internal: Processes mouse button press/release and updates mouse state */
-internal void _input_process_mouse_cursor(S32 x, S32 y);                        /* Internal: Updates current mouse cursor position in screen space */
+internal void _input_process_keyboard_key(Keyboard_Key key, b8 is_pressed);     /* Internal: Processes a key press/release and updates keyboard state */
+internal void _input_process_mouse_button(Mouse_Button button, b32 is_pressed); /* Internal: Processes mouse button press/release and updates mouse state */
+internal void _input_process_mouse_cursor(s32 x, s32 y);                        /* Internal: Updates current mouse cursor position in screen space */
 
 #endif // FZ_OS_WINDOW_H
