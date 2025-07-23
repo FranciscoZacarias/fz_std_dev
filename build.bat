@@ -8,10 +8,10 @@ set cl_default_flags=/Isrc /nologo /FC /Zi
 
 set external_include= /I"..\src\fz_std"
 
-set linker_flags= user32.lib ^
-                  gdi32.lib ^
-                  Shell32.lib ^
-                  winmm.lib
+REM set linker_flags= user32.lib ^
+REM                   gdi32.lib ^
+REM                   Shell32.lib ^
+REM                   winmm.lib
 
 if not exist build mkdir build
 pushd build

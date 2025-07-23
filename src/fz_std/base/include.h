@@ -1,7 +1,7 @@
-#ifndef FZ_INCLUDES_H
-#define FZ_INCLUDES_H
+#ifndef INCLUDES_H
+#define INCLUDES_H
 
-#define FZ_STD_INCLUDED
+#define STD_INCLUDED
 
 //~ CLib
 // TODO(fz): We want to replace these
@@ -11,7 +11,7 @@
 
 //~ Extern
 #define STB_SPRINTF_STATIC
-#define STB_SPRINTFZ_IMPLEMENTATION
+#define STB_SPRINTIMPLEMENTATION
 #include "external/stb_sprintf.h"
 #define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -58,4 +58,4 @@
 #include "fz_win32.c"
 #include "fz_win32_window.c"
 
-#endif // FZ_INCLUDES_H
+#endif // INCLUDES_H

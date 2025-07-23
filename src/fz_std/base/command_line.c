@@ -1,4 +1,4 @@
-internal Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 is_flag) {
+function Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 is_flag) {
   Command_Line_Arg result = (Command_Line_Arg) {
     .is_flag = is_flag,
     .key     = key,
@@ -7,18 +7,18 @@ internal Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 i
   return result;
 }
 
-internal void command_line_skip_whitespace(u8** cursor) {
+function void command_line_skip_whitespace(u8** cursor) {
   while (char8_is_space(**cursor)) (*cursor)++;
 }
 
-internal String8 command_line_strip_quotes(String8 in) {
+function String8 command_line_strip_quotes(String8 in) {
   if (in.size >= 2 && in.str[0] == '"' && in.str[in.size - 1] == '"') {
     return string8_new(in.size - 2,  in.str + 1);
   }
   return in;
 }
 
-internal String8 command_line_strip_leading_dashes(String8 in) {
+function String8 command_line_strip_leading_dashes(String8 in) {
   u64 offset = 0;
   while (offset < in.size && in.str[offset] == '-') {
     offset++;
@@ -26,7 +26,7 @@ internal String8 command_line_strip_leading_dashes(String8 in) {
   return string8_new(in.size - offset, in.str + offset);
 }
 
-internal String8 command_line_parse_token(u8** cursor) {
+function String8 command_line_parse_token(u8** cursor) {
   command_line_skip_whitespace(cursor);
   if (**cursor == 0) return (String8){0};
 
@@ -47,7 +47,28 @@ internal String8 command_line_parse_token(u8** cursor) {
   return result;
 }
 
-internal Command_Line command_line_parse(String8 input) {
+function Command_Line
+command_line_parse_from_argc_argv(s32 argc, u8** argv)
+{
+  Command_Line result = {0};
+  Scratch scratch = scratch_begin(0,0);
+  if (argc > 0)
+  {
+    String8 first_arg = string8_new(cstring_length(argv[0]), argv[0]);
+    String8_List arg_list = string8_list_new(scratch.arena, first_arg);
+    for (u32 idx = 1; i < argv, idx += 1)
+    {
+      String8 arg = string8_new(cstring_length(argv[i]), argv[i]);
+      string8_list_push(scratch.arena, &arg_list, arg);
+    }
+    String8 args = string8_list_join(scratch.arena, &arg_list);
+    result = command_line_parse(args);
+  }
+  scratch_end(&scratch);
+  return result;
+}
+
+function Command_Line command_line_parse(String8 input) {
   Command_Line result = {0};
 
   static u8 exe_buffer[MAX_PATH];

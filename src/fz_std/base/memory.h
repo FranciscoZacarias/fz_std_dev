@@ -1,5 +1,5 @@
-#ifndef FZ_MEMORY_H
-#define FZ_MEMORY_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #ifndef ARENA_RESERVE_SIZE
 # define ARENA_RESERVE_SIZE Gigabytes(1)
@@ -18,27 +18,27 @@ typedef struct Arena {
 
 #define ARENA_HEADER_SIZE AlignPow2(sizeof(Arena), memory_get_page_size())
 
-internal Arena* arena_init();
-internal Arena* arena_init_sized(u64 reserve, u64 commit);
+function Arena* arena_init();
+function Arena* arena_init_sized(u64 reserve, u64 commit);
 
-internal void* arena_push(Arena* arena, u64 size);
-internal void* arena_push_no_zero(Arena* arena, u64 size);
-internal void  arena_pop(Arena* arena, u64 size);
-internal void  arena_pop_to(Arena* arena, u64 pos);
-internal void  arena_clear(Arena* arena);
-internal void  arena_free(Arena* arena);
+function void* _arena_push(Arena* arena, u64 size);
+function void* _arena_push_no_zero(Arena* arena, u64 size);
+function void   arena_pop(Arena* arena, u64 size);
+function void   arena_pop_to(Arena* arena, u64 pos);
+function void   arena_clear(Arena* arena);
+function void   arena_free(Arena* arena);
 
-internal void print_arena(Arena *arena, const u8* label);
+function void print_arena(Arena *arena, const u8* label);
 
-#define ArenaPush(arena, type, count)       (type*)arena_push((arena), sizeof(type)*(count))
-#define ArenaPushNoZero(arena, type, count) (type*)arena_push_no_zero((arena), sizeof(type)*(count))
+#define array_push(arena, type, count)         (type*)_arena_push((arena), sizeof(type)*(count))
+#define array_push_no_zero(arena, type, count) (type*)_arena_push_no_zero((arena), sizeof(type)*(count))
 
-typedef struct Arena_Temp {
+typedef struct Scratch {
   Arena* arena;
   u64 temp_position;
-} Arena_Temp;
+} Scratch;
 
-internal Arena_Temp arena_temp_begin(Arena* arena);
-internal void       arena_temp_end(Arena_Temp* temp);
+function Scratch arena_temp_begin(Arena* arena);
+function void    arena_temp_end(Scratch* temp);
 
-#endif // FZ_MEMORY_H
+#endif // MEMORY_H

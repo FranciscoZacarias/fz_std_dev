@@ -1,9 +1,10 @@
 
-
+///////////////////////////////////////////////////////
 // @Section: Input-Keyboard
 
 // Win32 VK code translation table - MUST match enum order exactly
-static u32 _win32_key_table[Keyboard_Key_Count] = {
+static u32 _win32_key_table[Keyboard_Key_Count] =
+{
   0x08, // Keyboard_Key_BACKSPACE
   0x0D, // Keyboard_Key_ENTER
   0x09, // Keyboard_Key_TAB
@@ -134,16 +135,169 @@ static u32 _win32_key_table[Keyboard_Key_Count] = {
   0xDE, // Keyboard_Key_QUOTE
 };
 
-// Translation functions
-internal u32 _native_key_from_os_key(Keyboard_Key key) {
+function u32 
+_native_key_from_os_key(Keyboard_Key key)
+{
   return _win32_key_table[key];
 }
 
-internal Keyboard_Key _os_key_from_native_key(u32 native_key) {
-  for(u32 i = 0; i < Keyboard_Key_Count; ++i) {
-    if(_win32_key_table[i] == native_key) {
+function Keyboard_Key 
+_os_key_from_native_key(u32 native_key)
+{
+  for(u32 i = 0; i < Keyboard_Key_Count; ++i)
+  {
+    if(_win32_key_table[i] == native_key)
+    {
       return (Keyboard_Key)i;
     }
   }
   return Keyboard_Key_Count; // invalid
+}
+
+///////////////////////////////////////////////////////
+// @Section: Win32 functions
+
+LRESULT CALLBACK 
+WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  switch (message) 
+  {
+    case WM_SETCURSOR:
+    {
+      if (LOWORD(lParam) == HTCLIENT) 
+      {
+        win32_set_cursor(CURSOR_ARROW);
+        return true;
+      }
+    } break;
+
+    case WM_SIZE: 
+    {
+      _win32_window_resize_callback(LOWORD(lParam), HIWORD(lParam));
+      return 0;
+    } break;
+
+    // Keyboard keys
+    case WM_KEYDOWN: 
+    {
+      Keyboard_Key key = _os_key_from_native_key((u32)wParam);
+      if (key < Keyboard_Key_Count) 
+      {
+        _input_process_keyboard_key((Keyboard_Key)wParam, true);
+      }
+      else
+      {
+        // TODO(fz): Handle error
+      }
+      return 0;
+    } break;
+    case WM_KEYUP: 
+    {
+      Keyboard_Key key = _os_key_from_native_key((u32)wParam);
+      if (key < Keyboard_Key_Count) 
+      {
+        _input_process_keyboard_key((Keyboard_Key)wParam, false);
+      }
+      else
+      {
+        // TODO(fz): Handle error
+      }
+      return 0;
+    } break;
+
+    // Mouse Cursor
+    case WM_MOUSEMOVE: 
+    {
+      if (_IgnoreNextMouseMove) 
+      {
+        _IgnoreNextMouseMove = false;
+        return 0;
+      }
+      s32 x = LOWORD(lParam);
+      s32 y = HIWORD(lParam);
+      _input_process_mouse_cursor((f32)x, (f32)y);
+      return 0;
+    } break;
+    
+    // Mouse Buttons
+    case WM_LBUTTONDOWN: 
+    {
+      _input_process_mouse_button(MouseButton_Left, true);
+      return 0;
+    } break;
+    case WM_LBUTTONUP: 
+    {
+      _input_process_mouse_button(MouseButton_Left, false);
+      return 0;
+    } break;
+    case WM_RBUTTONDOWN: 
+    {
+      _input_process_mouse_button(MouseButton_Right, true);
+      return 0;
+    } break;
+    case WM_RBUTTONUP: 
+    {
+      _input_process_mouse_button(MouseButton_Right, false);
+      return 0;
+    } break;
+    case WM_MBUTTONDOWN: 
+    {
+      _input_process_mouse_button(MouseButton_Middle, true);
+      return 0;
+    } break;
+    case WM_MBUTTONUP: 
+    {
+      _input_process_mouse_button(MouseButton_Middle, false);
+      return 0;
+    } break;
+
+    case WM_DESTROY: 
+    {
+    #if 0 // TODO(Fz): check for opengl
+      wglMakeCurrent(null, null);
+      wglDeleteContext(_RenderingContextHandle);
+    #endif
+      ReleaseDC(hWnd, _DeviceContextHandle);
+      PostQuitMessage(0);
+      return 0;
+    } break;
+  }
+  return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+int WINAPI
+WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
+{
+  SetUnhandledExceptionFilter(&win32_exception_filter);
+
+  // dynamically load windows functions which are not guaranteed in all SDKs
+  {
+    HMODULE module = LoadLibraryA("kernel32.dll");
+    w32_SetThreadDescription_func = (W32_SetThreadDescription_Type *)GetProcAddress(module, "SetThreadDescription");
+    FreeLibrary(module);
+  }
+
+  _hInstance = hInstance;
+  thread_context_init_and_attach(&MainThreadContext);
+  Command_Line cmd_line = command_line_parse(lpCmdLine);
+  main_thread_base_entry_point(__argc, __wargv);
+  return 0;
+}
+
+function void
+_win32_window_resize_callback(s32 width, s32 height) {
+  if (height == 0) height = 1;
+  if (width == 0)  width = 1;
+  _WindowDimensions.x = width;
+  _WindowDimensions.y = height;
+  if (_IsOpenGLContextEnabled) {
+    glViewport(0, 0, width, height);
+  }
+}
+
+function LONG WINAPI
+win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs)
+{
+  // TODO(fz): Implement
+  ExitProcess(1);
 }

@@ -1,10 +1,10 @@
 
-internal Arena* arena_init() {
+function Arena* arena_init() {
   Arena* arena = arena_init_sized(ARENA_RESERVE_SIZE, ARENA_COMMIT_SIZE);
   return arena;
 }
 
-internal Arena* arena_init_sized(u64 reserve, u64 commit) {
+function Arena* arena_init_sized(u64 reserve, u64 commit) {
   void* memory = null;
   
   u64 page_size = memory_get_page_size();
@@ -34,13 +34,13 @@ internal Arena* arena_init_sized(u64 reserve, u64 commit) {
   return arena;
 }
 
-internal void* arena_push(Arena* arena, u64 size) {
+function void* arena_push(Arena* arena, u64 size) {
   void* result = arena_push_no_zero(arena, size);
   MemoryZero(result, size);
   return result;
 }
 
-internal void* arena_push_no_zero(Arena* arena, u64 size) {
+function void* arena_push_no_zero(Arena* arena, u64 size) {
   void *result = null;
 
   if (arena->position + size <= arena->reserved) {
@@ -66,7 +66,7 @@ internal void* arena_push_no_zero(Arena* arena, u64 size) {
   return result;
 }
 
-internal void  arena_pop(Arena* arena, u64 size) {
+function void  arena_pop(Arena* arena, u64 size) {
   if (size > arena->position) {
     printf("Warning :: Arena :: Trying to pop %lld bytes from arena with %lld allocated. Will pop %lld instead of %lld.\n", size, arena->position, arena->position, size);
     size = arena->position;
@@ -74,7 +74,7 @@ internal void  arena_pop(Arena* arena, u64 size) {
   arena->position -= size;
 }
 
-internal void  arena_pop_to(Arena* arena, u64 pos) {
+function void  arena_pop_to(Arena* arena, u64 pos) {
   if (pos > arena->reserved) {
     printf("Warning :: Arena :: Trying to pop over arena's reserved. Will pop only to %lld instead of %lld", arena->reserved, pos);
     pos = arena->reserved;
@@ -85,28 +85,28 @@ internal void  arena_pop_to(Arena* arena, u64 pos) {
   arena->position = pos;
 }
 
-internal void  arena_clear(Arena* arena) {
+function void  arena_clear(Arena* arena) {
   arena_pop(arena, arena->position);
 }
 
-internal void  arena_free(Arena* arena) {
+function void  arena_free(Arena* arena) {
   memory_release((u8*)arena, arena->reserved);
 }
 
-internal void print_arena(Arena *arena, const u8* label) {
+function void print_arena(Arena *arena, const u8* label) {
   f32 committed_percentage = ((f64)arena->position / arena->commited) * 100.0f;
   f32 reserved_percentage  = ((f64)arena->position / arena->reserved) * 100.0f;
   printf("%s: Arena { reserved: %llu, commited: %llu, commit_size: %llu, position: %llu, align: %llu, committed_percentage: %.2f%%, reserved_percentage: %.2f%% }\n",
          label, arena->reserved, arena->commited, arena->commit_size, arena->position, arena->align, committed_percentage, reserved_percentage);
 }
 
-internal Arena_Temp arena_temp_begin(Arena* arena) {
-  Arena_Temp temp;
+function Scratch arena_temp_begin(Arena* arena) {
+  Scratch temp;
   temp.arena = arena;
   temp.temp_position = arena->position;
   return temp;
 }
 
-internal void arena_temp_end(Arena_Temp* temp) {
+function void arena_temp_end(Scratch* temp) {
   arena_pop_to(temp->arena, temp->temp_position);
 }

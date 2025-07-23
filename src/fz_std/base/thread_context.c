@@ -1,4 +1,4 @@
-internal void thread_context_init_and_attach(Thread_Context* thread_context) {
+function void thread_context_init_and_attach(Thread_Context* thread_context) {
   MemoryZeroStruct(thread_context);
   Arena **arena_ptr = thread_context->arenas;
   for (u64 i = 0; i < ArrayCount(thread_context->arenas); i += 1, arena_ptr += 1){
@@ -7,17 +7,17 @@ internal void thread_context_init_and_attach(Thread_Context* thread_context) {
   ThreadContextThreadLocal = thread_context;
 }
 
-internal void thread_context_free() {
+function void thread_context_free() {
   for(u64 i = 0; i < ArrayCount(ThreadContextThreadLocal->arenas); i += 1) {
     arena_release(ThreadContextThreadLocal->arenas[i]);
   }
 }
 
-internal Thread_Context* thread_context_get_equipped() {
+function Thread_Context* thread_context_get_equipped() {
   return ThreadContextThreadLocal;
 }
 
-internal Arena* thread_context_get_scratch(Arena** conflicts, u64 count) {
+function Arena* thread_context_get_scratch(Arena** conflicts, u64 count) {
   Thread_Context *thread_context = thread_context_get_equipped();
   
   Arena *result = 0;

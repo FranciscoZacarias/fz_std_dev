@@ -1,5 +1,5 @@
-#ifndef FZ_COMMAND_LINE_H
-#define FZ_COMMAND_LINE_H
+#ifndef COMMAND_LINE_H
+#define COMMAND_LINE_H
 
 // The acceptable commands are:
 // --command "this is my value" -no-string
@@ -17,7 +17,7 @@ typedef struct Command_Line_Arg {
   String8 value;
 } Command_Line_Arg;
 
-internal Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 is_flag);
+function Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 is_flag);
 
 typedef struct Command_Line {
   String8 executable;
@@ -26,10 +26,11 @@ typedef struct Command_Line {
   u32              args_count;
 } Command_Line;
 
-internal Command_Line command_line_parse(String8 lpCmdLine);
-internal String8      command_line_parse_token(u8** cursor);
-internal void         command_line_skip_whitespace(u8** cursor);
-internal String8      command_line_strip_quotes(String8 in);
-internal String8      command_line_strip_leading_dashes(String8 in);
+function Command_Line command_line_parse(String8 input);
+function Command_Line command_line_parse_from_argc_argv(s32 argc, u8** argv);
+function String8      command_line_parse_token(u8** cursor);
+function void         command_line_skip_whitespace(u8** cursor);
+function String8      command_line_strip_quotes(String8 in);
+function String8      command_line_strip_leading_dashes(String8 in);
 
-#endif // FZ_COMMAND_LINE_H
+#endif // COMMAND_LINE_H
