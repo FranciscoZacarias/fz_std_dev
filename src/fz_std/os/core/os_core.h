@@ -2,13 +2,6 @@
 #define OS_CORE_H
 
 ///////////////////////////////////////////////////////
-// @Section: Globals
-global Vec2S32 _WindowDimensions = {0};
-
-global b32 _IgnoreNextMouseMove = false;
-global b32 _IsCursorLocked      = false;
-
-///////////////////////////////////////////////////////
 // @Section: System info
 typedef struct OS_System_Info
 {
@@ -68,16 +61,17 @@ typedef struct PerformanceTimer
   u64 start_ticks;
   u64 end_ticks;
   f32 elapsed_seconds;
-} PerformanceTimer;
+} Performance_Timer;
 
-function void os_timer_init();                              /* Initializes performance timing */
-function void os_timer_start(PerformanceTimer* timer);      /* Starts the given timer */
-function void os_timer_end(PerformanceTimer* timer);        /* Stops the timer and calculates elapsed time */
-function f32  os_get_elapsed_time(PerformanceTimer* timer); /* Returns time elapsed since last frame */
+function void os_timer_init();                               /* Initializes performance timing */
+function void os_timer_start(Performance_Timer* timer);      /* Starts the given timer */
+function void os_timer_end(Performance_Timer* timer);        /* Stops the timer and calculates elapsed time */
+function f32  os_get_elapsed_time();                         /* Returns time elapsed since program started */
+function f32  os_get_frame_time();                           /* Returns time elapsed since last frame */
 
 ///////////////////////////////////////////////////////
 // @Section: Console
-function void    os_console_init();                           /* Initializes the console (allocates or attaches on Windows, no-op on Unix) */
+function b32     os_console_init();                           /* Initializes the console (allocates or attaches on Windows, no-op on Unix) */
 function void    os_console_write(String8 string);            /* Writes a UTF-8 string to the console without a newline */
 function void    os_console_write_line(String8 string);       /* Writes a UTF-8 string to the console followed by a newline */
 function void    os_console_writef(char *fmt, ...);           /* Formatted print to console, behaves like printf */
@@ -131,6 +125,7 @@ function String8 os_directory_push(String8 path, String8 directory);   /* Change
 // @Section: Window Lifecycle
 function void os_window_open(s32 width, s32 height, String8 title); /* Creates and shows a window */
 function void os_window_close();                                    /* Closes and destroys a window */
+function b32  os_window_swap_buffers();                             /* Swaps buffers for the only existing window */
 
 ///////////////////////////////////////////////////////
 // @Section: Window Flags
@@ -381,5 +376,15 @@ global OS_State OSState = {0};
 ///////////////////////////////////////////////////////
 // @Section: Entry point
 function void entry_point(Command_Line* command_line); /* Application entry point implemented by the user */
+
+///////////////////////////////////////////////////////
+// @Section: Globals
+global Vec2S32 _WindowDimensions = {0};
+
+global b32 _IgnoreNextMouseMove  = false;
+global b32 _IsCursorLocked       = false;
+
+global Performance_Timer _Timer_FrameTime   = {0};
+global Performance_Timer _Timer_ElapsedTime = {0};
 
 #endif // OS_CORE_H

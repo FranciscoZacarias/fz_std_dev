@@ -1,7 +1,9 @@
 #ifndef OS_INCLUDE_H
 #define OS_INCLUDE_H
 
+#include <stdio.h>
 #include "os/core/os_core.h"
+
 #if OS_WINDOWS
 # include "os/core/win32/os_core_win32.h"
 #elif OS_LINUX

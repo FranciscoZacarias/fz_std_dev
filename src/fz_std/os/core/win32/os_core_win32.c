@@ -76,42 +76,96 @@ os_memory_get_page_size()
 
 ///////////////////////////////////////////////////////
 // @Section: Time
-function void 
+function void
 os_timer_init()
 {
-  QueryPerformanceFrequency(&os_performance_frequency);
+  QueryPerformanceFrequency(&win32_performance_frequency);
+  os_timer_start(&_Timer_ElapsedTime);
+  os_timer_start(&_Timer_FrameTime);
 }
 
-function void 
-os_timer_start(PerformanceTimer* timer)
+function void
+os_timer_start(Performance_Timer* timer)
 {
   LARGE_INTEGER counter;
   QueryPerformanceCounter(&counter);
   timer->start_ticks = (u64)counter.QuadPart;
+  timer->end_ticks = 0;
+  timer->elapsed_seconds = 0.0f;
 }
 
-function void 
-os_timer_end(PerformanceTimer* timer)
+function void
+os_timer_end(Performance_Timer* timer)
 {
   LARGE_INTEGER counter;
   QueryPerformanceCounter(&counter);
   timer->end_ticks = (u64)counter.QuadPart;
   u64 delta = timer->end_ticks - timer->start_ticks;
-  timer->elapsed_seconds = (f32)((f64)delta / (f64)os_performance_frequency.QuadPart);
+  timer->elapsed_seconds = (f32)((double)delta / (double)win32_performance_frequency.QuadPart);
 }
 
-function f32  
-os_get_elapsed_time(PerformanceTimer* timer)
+function f32
+os_get_elapsed_time()
 {
-  return timer->elapsed_seconds;
+  LARGE_INTEGER current;
+  QueryPerformanceCounter(&current);
+  u64 delta = (u64)current.QuadPart - _Timer_ElapsedTime.start_ticks;
+  return (f32)((double)delta / (double)win32_performance_frequency.QuadPart);
+}
+
+function f32
+os_get_frame_time()
+{
+  LARGE_INTEGER current;
+  QueryPerformanceCounter(&current);
+  u64 delta = (u64)current.QuadPart - _Timer_FrameTime.start_ticks;
+  return (f32)((double)delta / (double)win32_performance_frequency.QuadPart);
 }
 
 ///////////////////////////////////////////////////////
 // @Section: Console
-function void
+function b32
 os_console_init()
 {
+  b32 result = false;
 
+  if (GetConsoleWindow() != NULL)
+  {
+    // Already attached to a console; no need to allocate a new one.
+    result = false;
+  }
+  else if (AttachConsole(ATTACH_PARENT_PROCESS))
+  {
+    // Try attaching to parent process console.
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    result = true;
+  }
+  else if (AllocConsole())
+  {
+    // No console attached; allocate a new one.
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    result = true;
+  }
+
+  // Try to enable color
+  HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  if (handle != INVALID_HANDLE_VALUE)
+  {
+    DWORD mode = 0;
+    if (GetConsoleMode(handle, &mode))
+    {
+      if ((mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0)
+      {
+        SetConsoleMode(handle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+      }
+    }
+  }
+
+  return result;
 }
 
 function void
@@ -387,10 +441,10 @@ os_directory_push(String8 path, String8 directory)
 function void
 os_window_open(s32 width, s32 height, String8 title)
 {
-  os_window_set_size(width, height);
-  os_window_set_title(title);
   ShowWindow(_WindowHandle, SW_SHOW);
   UpdateWindow(_WindowHandle);
+  os_window_set_size(width, height);
+  //os_window_set_title(title);
 }
 
 function void     
@@ -400,56 +454,126 @@ os_window_close()
   UpdateWindow(_WindowHandle);
 }
 
+function b32
+os_window_swap_buffers()
+{
+  b32 result = true;
+
+  os_timer_end(&_Timer_FrameTime);
+  os_timer_start(&_Timer_FrameTime);
+
+  MSG msg = {0};
+  if (_WindowHandle != null) {
+    _input_update();
+    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+      if (msg.message == WM_QUIT) 
+      {
+        _ApplicationReturn = (s32)msg.wParam;
+        result = false;
+      }
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
+    }
+  }
+
+  return true;
+}
+
 ///////////////////////////////////////////////////////
 // @Section: Window Flags
+
 function b32
 os_window_is_fullscreen()
 {
+  RECT rect;
+  GetWindowRect(_WindowHandle, &rect);
 
+  MONITORINFO mi = { sizeof(mi) };
+  GetMonitorInfo(MonitorFromWindow(_WindowHandle, MONITOR_DEFAULTTONEAREST), &mi);
+
+  b32 result = (rect.left   == mi.rcMonitor.left &&
+                rect.top    == mi.rcMonitor.top &&
+                rect.right  == mi.rcMonitor.right &&
+                rect.bottom == mi.rcMonitor.bottom);
+
+  return result;
 }
 
 function void
 os_window_set_fullscreen(b32 set)
 {
+  static WINDOWPLACEMENT prev = { sizeof(prev) };
+  if (set)
+  {
+    GetWindowPlacement(_WindowHandle, &prev);
 
+    MONITORINFO mi = { sizeof(mi) };
+    GetMonitorInfo(MonitorFromWindow(_WindowHandle, MONITOR_DEFAULTTONEAREST), &mi);
+
+    SetWindowLong(_WindowHandle, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+    SetWindowPos(_WindowHandle, HWND_TOP,
+                 mi.rcMonitor.left, mi.rcMonitor.top,
+                 mi.rcMonitor.right - mi.rcMonitor.left,
+                 mi.rcMonitor.bottom - mi.rcMonitor.top,
+                 SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+  }
+  else
+  {
+    SetWindowLong(_WindowHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+    SetWindowPlacement(_WindowHandle, &prev);
+    SetWindowPos(_WindowHandle, NULL, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER |
+                 SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+  }
 }
 
 function b32
 os_window_is_maximized()
 {
-
+  b32 result = IsZoomed(_WindowHandle);
+  return result;
 }
 
 function void
 os_window_set_maximized(b32 set)
 {
-
+  ShowWindow(_WindowHandle, set ? SW_MAXIMIZE : SW_RESTORE);
 }
 
 function b32
 os_window_is_minimized()
 {
-
+  b32 result = IsIconic(_WindowHandle);
+  return result;
 }
 
 function void
 os_window_set_minimized(b32 set)
 {
-
+  ShowWindow(_WindowHandle, set ? SW_MINIMIZE : SW_RESTORE);
 }
 
 ///////////////////////////////////////////////////////
 // @Section: Window Appearance
+
 function void
 os_window_set_visible(b32 visible)
 {
-
+  ShowWindow(_WindowHandle, visible ? SW_SHOW : SW_HIDE);
 }
 
 function b32
 os_window_set_title(String8 title)
 {
-
+  Scratch scratch = scratch_begin(0, 0);
+  char* ctitle = cstring_from_string8(scratch.arena, title);
+  b32 result = SetWindowTextA(_WindowHandle, ctitle);
+  if (!result) 
+  {
+    win32_debug_output_last_error(S("CreateWindowExW"));
+  }
+  scratch_end(&scratch);
+  return result;
 }
 
 function void
@@ -479,13 +603,17 @@ os_window_push_custom_title_bar_client_area(Range2F32 rect)
 function void
 os_window_set_position(Vec2F32 pos)
 {
-
+  SetWindowPos(_WindowHandle, 0,
+               (int)pos.x, (int)pos.y, 0, 0,
+               SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
 function void
 os_window_set_size(s32 width, s32 height)
 {
-
+  SetWindowPos(_WindowHandle, 0,
+               0, 0, width, height,
+               SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
 ///////////////////////////////////////////////////////
@@ -493,25 +621,93 @@ os_window_set_size(s32 width, s32 height)
 function void
 os_cursor_set(Cursor_Type cursor)
 {
+  HCURSOR hCursor = NULL;
 
+  switch (cursor)
+  {
+    case CURSOR_ARROW:
+    {
+      hCursor = LoadCursor(NULL, IDC_ARROW);
+    }
+    break;
+    case CURSOR_HAND:
+    {
+      hCursor = LoadCursor(NULL, IDC_HAND);
+    }
+    break;
+    case CURSOR_CROSSHAIR:
+    {
+      hCursor = LoadCursor(NULL, IDC_CROSS);
+    }
+    break;
+    case CURSOR_IBEAM:
+    {
+      hCursor = LoadCursor(NULL, IDC_IBEAM);
+    }
+    break;
+    case CURSOR_WAIT:
+    { 
+      hCursor = LoadCursor(NULL, IDC_WAIT);
+    }
+    break;
+    case CURSOR_SIZE_ALL:
+    {
+      hCursor = LoadCursor(NULL, IDC_SIZEALL);
+    }
+    break;
+    default:
+    {
+      hCursor = LoadCursor(NULL, IDC_ARROW);
+    }
+    break;
+  }
+
+  if (hCursor)
+  {
+    SetCursor(hCursor);
+  }
 }
 
 function void
 os_cursor_set_position(s32 x, s32 y)
 {
-
+  SetCursorPos(x, y);
 }
 
 function void
 os_cursor_lock(b32 lock)
 {
+  if (lock)
+  {
+    RECT rect;
+    GetClientRect(_WindowHandle, &rect);
+    POINT center = {(rect.right - rect.left) / 2, (rect.bottom - rect.top) / 2};
+    ClientToScreen(_WindowHandle, &center);
+    SetCursorPos(center.x, center.y);
 
+    _IsCursorLocked      = true;
+    _IgnoreNextMouseMove = true;
+
+    // Reset deltas to avoid cursor jump
+    _InputState.mouse_current.delta.x  = 0.0f;
+    _InputState.mouse_current.delta.y  = 0.0f;
+    _InputState.mouse_previous.delta.x = 0.0f;
+    _InputState.mouse_previous.delta.y = 0.0f;
+    MemoryCopyStruct(&_InputState.mouse_previous, &_InputState.mouse_current);
+  }
+  else
+  {
+    _IsCursorLocked = false;
+  }
 }
 
 function void
 os_cursor_hide(b32 hide)
 {
-
+  // Win32 quirk. It has an internal counter required to show the cursor.
+  // The while loops just make sure it exhausts the counter and applies immediately.
+  while (ShowCursor(hide ? FALSE : TRUE) >= 0 &&  hide);
+  while (ShowCursor(hide ? FALSE : TRUE) < 0  && !hide);
 }
 
 ///////////////////////////////////////////////////////
@@ -686,13 +882,15 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         os_cursor_set(CURSOR_ARROW);
         return true;
       }
-    } break;
+    }
+    break;
 
     case WM_SIZE: 
     {
       _win32_window_resize_callback(LOWORD(lParam), HIWORD(lParam));
       return 0;
-    } break;
+    }
+    break;
 
     // Keyboard keys
     case WM_KEYDOWN: 
@@ -707,7 +905,8 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // TODO(fz): Handle error
       }
       return 0;
-    } break;
+    }
+    break;
     case WM_KEYUP: 
     {
       Keyboard_Key key = _os_key_from_native_key((u32)wParam);
@@ -720,7 +919,8 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // TODO(fz): Handle error
       }
       return 0;
-    } break;
+    }
+    break;
 
     // Mouse Cursor
     case WM_MOUSEMOVE: 
@@ -734,39 +934,53 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       s32 y = HIWORD(lParam);
       _input_process_mouse_cursor((f32)x, (f32)y);
       return 0;
-    } break;
+    }
+    break;
     
     // Mouse Buttons
     case WM_LBUTTONDOWN: 
     {
       _input_process_mouse_button(MouseButton_Left, true);
       return 0;
-    } break;
+    }
+    break;
     case WM_LBUTTONUP: 
     {
       _input_process_mouse_button(MouseButton_Left, false);
       return 0;
-    } break;
+    }
+    break;
     case WM_RBUTTONDOWN: 
     {
       _input_process_mouse_button(MouseButton_Right, true);
       return 0;
-    } break;
+    }
+    break;
     case WM_RBUTTONUP: 
     {
       _input_process_mouse_button(MouseButton_Right, false);
       return 0;
-    } break;
+    }
+    break;
     case WM_MBUTTONDOWN: 
     {
       _input_process_mouse_button(MouseButton_Middle, true);
       return 0;
-    } break;
+    }
+    break;
     case WM_MBUTTONUP: 
     {
       _input_process_mouse_button(MouseButton_Middle, false);
       return 0;
-    } break;
+    }
+    break;
+
+    case WM_CLOSE:
+    {
+      DestroyWindow(hWnd);
+      return 0;
+    }
+    break;
 
     case WM_DESTROY: 
     {
@@ -777,7 +991,8 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       ReleaseDC(hWnd, _DeviceContextHandle);
       PostQuitMessage(0);
       return 0;
-    } break;
+    }
+    break;
   }
   return DefWindowProc(hWnd, message, wParam, lParam);
 }
@@ -846,7 +1061,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
   // Prepare window (still requires calling os_window_open in user layer to actually open it).
   {
     _input_init();
-    _WindowHandle = _win32_window_create(_hInstance, 0, 0);
+    _WindowHandle = _win32_window_create(_hInstance, 600, 600);
     if (!_WindowHandle)
     {
       ERROR_MESSAGE_AND_EXIT("Failed to get window handle\n");
@@ -863,7 +1078,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
   Command_Line cmd_line = command_line_parse(string8_from_cstring(lpCmdLine));
   main_thread_base_entry_point(__argc, __argv);
 
-  return 0;
+  return _ApplicationReturn;
 }
 
 ///////////////////////////////////////////////////////
@@ -880,25 +1095,20 @@ _win32_window_create(HINSTANCE hInstance, s32 width, s32 height)
     .hInstance     = hInstance,
     .hIcon         = LoadIcon(NULL, IDI_APPLICATION),
     .hCursor       = LoadCursor(NULL, IDC_ARROW),
-    .lpszClassName = L"opengl_window_class",
+    .lpszClassName = L"FZ_Window_Class",
   };
 
   ATOM atom = RegisterClassExW(&wc);
   Assert(atom && "Failed to register window class");
     
-  LPCSTR app_name = "f_program"; // TODO(fz): Function to rename window
-
   DWORD exstyle = WS_EX_APPWINDOW;
   DWORD style   = WS_OVERLAPPEDWINDOW;
 
-  result = CreateWindowExW(
-    exstyle, wc.lpszClassName, L"FZWindow", style,
-    CW_USEDEFAULT, CW_USEDEFAULT, width, height,
-    NULL, NULL, wc.hInstance, NULL);
-  Assert(result && "Failed to create window");
-
-  _DeviceContextHandle = GetDC(result);
-  Assert(_DeviceContextHandle && "Failed to window device context");
+  result = CreateWindowExW(exstyle, wc.lpszClassName, L"FZ_Window_Title", style, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
+  if (!result) 
+  {
+    win32_debug_output_last_error(S("CreateWindowExW"));
+  }
 
   return result;
 }
@@ -928,4 +1138,44 @@ win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs)
 {
   // TODO(fz): Implement
   ExitProcess(1);
+}
+
+function void
+win32_debug_output_last_error(String8 context)
+{
+  DWORD err = GetLastError();
+  if (err == 0) return;
+
+  LPWSTR messageBuffer = NULL;
+  FormatMessageW(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    NULL,
+    err,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+    (LPWSTR)&messageBuffer,
+    0,
+    NULL);
+
+  if (messageBuffer)
+  {
+    // Convert wide string to narrow string (UTF-8 or ANSI) for OutputDebugStringA
+    int size_needed = WideCharToMultiByte(CP_ACP, 0, messageBuffer, -1, NULL, 0, NULL, NULL);
+    if (size_needed > 0)
+    {
+      char* messageA = (char*)HeapAlloc(GetProcessHeap(), 0, size_needed);
+      if (messageA)
+      {
+        Scratch scratch = scratch_begin(0,0);
+        char* cstring_context = cstring_from_string8(scratch.arena, context);
+        WideCharToMultiByte(CP_ACP, 0, messageBuffer, -1, messageA, size_needed, NULL, NULL);
+        OutputDebugStringA(cstring_context);
+        OutputDebugStringA(": ");
+        OutputDebugStringA(messageA);
+        OutputDebugStringA("\n");
+        HeapFree(GetProcessHeap(), 0, messageA);
+        scratch_end(&scratch);
+      }
+    }
+    LocalFree(messageBuffer);
+  }
 }
