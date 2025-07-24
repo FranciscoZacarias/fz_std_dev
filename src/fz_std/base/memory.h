@@ -15,11 +15,10 @@ typedef struct Arena {
   u64 position;      // Current position of the arena
   u64 align;         // Arena's memory alignment
 } Arena;
+#define ARENA_HEADER_SIZE AlignPow2(sizeof(Arena), os_memory_get_page_size())
 
-#define ARENA_HEADER_SIZE AlignPow2(sizeof(Arena), memory_get_page_size())
-
-function Arena* arena_init();
-function Arena* arena_init_sized(u64 reserve, u64 commit);
+function Arena* arena_alloc();
+function Arena* arena_alloc_sized(u64 reserve, u64 commit);
 
 function void* _arena_push(Arena* arena, u64 size);
 function void* _arena_push_no_zero(Arena* arena, u64 size);

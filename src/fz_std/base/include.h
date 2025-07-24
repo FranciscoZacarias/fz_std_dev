@@ -3,6 +3,8 @@
 
 #define STD_INCLUDED
 
+#define ERROR_MESSAGE_AND_EXIT(...) // TODO(fz): Properly error handling
+
 //~ CLib
 // TODO(fz): We want to replace these
 #include <stdlib.h>

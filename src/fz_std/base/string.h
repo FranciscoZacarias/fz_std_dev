@@ -28,7 +28,7 @@ function String8 string8_trim(String8 str);
 function b32     string8_contains(String8 str, String8 substring);
 function b32     string8_find_first(String8 str, String8 substring, u64* index);
 function b32     string8_find_last(String8 str, String8 substring, u64* index); 
-function b32     string8_equal(String8 a, String8 b);
+function b32     string8_match(String8 a, String8 b, b32 case_sensitive);
 function void    string8_printf(String8 str);
 
 function String8_List string8_split(Arena* arena, String8 str, String8 split_character);
@@ -38,12 +38,13 @@ function void         string8_list_clear(String8_List* list);
 function void         string8_list_push(Arena* arena, String8_List* list, String8 str);
 function String8      string8_list_join(Arena* arena, String8_List* list);
 
-function b32     f32_from_string8(String8 str, f32* value);
-function b32     s32_from_string8(String8 str, s32* value);
-function b32     b32_from_string8(String8 str, b32* value);
-function u8*     cstring_from_string8(Arena* arena, String8 str);
-function String8 string8_from_cstring(u8* cstring);
-function u32     cstring_length(u8* cstring);
+function b32      f32_from_string8(String8 str, f32* value);
+function b32      s32_from_string8(String8 str, s32* value);
+function b32      b32_from_string8(String8 str, b32* value);
+function u8*      cstring_from_string8(Arena* arena, String8 str);
+function String8  string8_from_cstring(u8* cstring);
+function u32      cstring_length(u8* cstring);
+
 
 //~ Char Functions
 function b32 char8_is_alpha(u8 c);

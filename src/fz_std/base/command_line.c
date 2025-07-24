@@ -1,5 +1,8 @@
-function Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 is_flag) {
-  Command_Line_Arg result = (Command_Line_Arg) {
+function Command_Line_Arg
+command_line_arg_new(String8 key, String8 value, b32 is_flag)
+{
+  Command_Line_Arg result = (Command_Line_Arg)
+  {
     .is_flag = is_flag,
     .key     = key,
     .value   = value  
@@ -7,38 +10,53 @@ function Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 i
   return result;
 }
 
-function void command_line_skip_whitespace(u8** cursor) {
+function void
+command_line_skip_whitespace(u8** cursor)
+{
   while (char8_is_space(**cursor)) (*cursor)++;
 }
 
-function String8 command_line_strip_quotes(String8 in) {
-  if (in.size >= 2 && in.str[0] == '"' && in.str[in.size - 1] == '"') {
+function String8
+command_line_strip_quotes(String8 in)
+{
+  if (in.size >= 2 && in.str[0] == '"' && in.str[in.size - 1] == '"')
+  {
     return string8_new(in.size - 2,  in.str + 1);
   }
   return in;
 }
 
-function String8 command_line_strip_leading_dashes(String8 in) {
+function String8
+command_line_strip_leading_dashes(String8 in)
+{
   u64 offset = 0;
-  while (offset < in.size && in.str[offset] == '-') {
+  while (offset < in.size && in.str[offset] == '-')
+  {
     offset++;
   }
   return string8_new(in.size - offset, in.str + offset);
 }
 
-function String8 command_line_parse_token(u8** cursor) {
+function String8
+command_line_parse_token(u8** cursor)
+{
   command_line_skip_whitespace(cursor);
-  if (**cursor == 0) return (String8){0};
+  if (**cursor == 0)
+  {
+    return (String8){0};
+  }
 
   u8* start = *cursor;
   u8* end = start;
 
-  if (*start == '"') {
+  if (*start == '"')
+  {
     start++; // skip opening quote
     end = start;
     while (*end && *end != '"') end++;
     *cursor = (*end == '"') ? end + 1 : end;
-  } else {
+  } else
+  {
     while (*end && !char8_is_space(*end)) end++;
     *cursor = end;
   }
@@ -56,9 +74,9 @@ command_line_parse_from_argc_argv(s32 argc, u8** argv)
   {
     String8 first_arg = string8_new(cstring_length(argv[0]), argv[0]);
     String8_List arg_list = string8_list_new(scratch.arena, first_arg);
-    for (u32 idx = 1; i < argv, idx += 1)
+    for (s32 idx = 1; idx < argc; idx += 1)
     {
-      String8 arg = string8_new(cstring_length(argv[i]), argv[i]);
+      String8 arg = string8_new(cstring_length(argv[idx]), argv[idx]);
       string8_list_push(scratch.arena, &arg_list, arg);
     }
     String8 args = string8_list_join(scratch.arena, &arg_list);
@@ -68,7 +86,9 @@ command_line_parse_from_argc_argv(s32 argc, u8** argv)
   return result;
 }
 
-function Command_Line command_line_parse(String8 input) {
+function Command_Line
+command_line_parse(String8 input)
+{
   Command_Line result = {0};
 
   static u8 exe_buffer[MAX_PATH];
@@ -89,14 +109,16 @@ function Command_Line command_line_parse(String8 input) {
 
   u8* cursor = temp_buffer;
 
-  while (*cursor && result.args_count < MAX_COMMAND_LINE_ARGS) {
+  while (*cursor && result.args_count < MAX_COMMAND_LINE_ARGS)
+  {
     command_line_skip_whitespace(&cursor);
     if (*cursor == 0) break;
 
     String8 token = command_line_parse_token(&cursor);
     if (token.size == 0) break;
 
-    if (token.str[0] == '-') {
+    if (token.str[0] == '-')
+    {
       String8 key = command_line_strip_leading_dashes(token);
 
       // Copy key to stable memory
@@ -109,10 +131,13 @@ function Command_Line command_line_parse(String8 input) {
 
       // Peek for value
       command_line_skip_whitespace(&cursor);
-      if (*cursor == 0 || *cursor == '-') {
+      if (*cursor == 0 || *cursor == '-')
+      {
         // Flag
         result.args[result.args_count++] = command_line_arg_new(key_copy, key_copy, true);
-      } else {
+      }
+      else
+      {
         String8 val = command_line_parse_token(&cursor);
         val = command_line_strip_quotes(val);
 

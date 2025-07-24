@@ -1,22 +1,22 @@
 
-function Arena* arena_init() {
-  Arena* arena = arena_init_sized(ARENA_RESERVE_SIZE, ARENA_COMMIT_SIZE);
+function Arena* arena_alloc() {
+  Arena* arena = arena_alloc_sized(ARENA_RESERVE_SIZE, ARENA_COMMIT_SIZE);
   return arena;
 }
 
-function Arena* arena_init_sized(u64 reserve, u64 commit) {
+function Arena* arena_alloc_sized(u64 reserve, u64 commit) {
   void* memory = null;
   
-  u64 page_size = memory_get_page_size();
+  u64 page_size = os_memory_get_page_size();
   reserve = AlignPow2(reserve, page_size);
   commit  = AlignPow2(commit,  page_size);
   
   Assert(ARENA_HEADER_SIZE < commit && commit <= reserve);
   
-  memory = memory_reserve(reserve);
-  if(!memory_commit(memory, commit)) {
+  memory = os_memory_reserve(reserve);
+  if(!os_memory_commit(memory, commit)) {
     memory = null;
-    memory_release(memory, reserve);
+    os_memory_release(memory, reserve);
   }
   
   Arena* arena = (Arena*) memory;
@@ -34,14 +34,16 @@ function Arena* arena_init_sized(u64 reserve, u64 commit) {
   return arena;
 }
 
-function void* arena_push(Arena* arena, u64 size) {
-  void* result = arena_push_no_zero(arena, size);
+function void*
+_arena_push(Arena* arena, u64 size) {
+  void* result = _arena_push_no_zero(arena, size);
   MemoryZero(result, size);
   return result;
 }
 
-function void* arena_push_no_zero(Arena* arena, u64 size) {
-  void *result = null;
+function void*
+_arena_push_no_zero(Arena* arena, u64 size) {
+  void* result = null;
 
   if (arena->position + size <= arena->reserved) {
     u64 position_memory = AlignPow2(arena->position, arena->align);
@@ -51,7 +53,7 @@ function void* arena_push_no_zero(Arena* arena, u64 size) {
       u64 commit_aligned = AlignPow2(new_position, arena->commit_size);
       u64 commit_clamped = ClampTop(commit_aligned, arena->reserved);
       u64 commit_size    = commit_clamped - arena->commited;
-      if (memory_commit((u8*)arena + arena->commited, commit_size)) {
+      if (os_memory_commit((u8*)arena + arena->commited, commit_size)) {
         arena->commited = commit_clamped;
       } else {
         ERROR_MESSAGE_AND_EXIT("Could not commit memory when increasing the arena's committed memory.");
@@ -90,7 +92,7 @@ function void  arena_clear(Arena* arena) {
 }
 
 function void  arena_free(Arena* arena) {
-  memory_release((u8*)arena, arena->reserved);
+  os_memory_release((u8*)arena, arena->reserved);
 }
 
 function void print_arena(Arena *arena, const u8* label) {

@@ -5,11 +5,11 @@ void _input_init() {
   AssertNoReentry();
   MemoryZeroStruct(&_InputState);
 
-  _InputState.mouse_current.screen_space.x = WindowWidth/2;
-  _InputState.mouse_current.screen_space.y = WindowHeight/2;
+  _InputState.mouse_current.screen_space.x = _WindowDimensions.x/2;
+  _InputState.mouse_current.screen_space.y = _WindowDimensions.y/2;
   
-  _InputState.mouse_previous.screen_space.x = WindowWidth/2;
-  _InputState.mouse_previous.screen_space.y = WindowHeight/2;
+  _InputState.mouse_previous.screen_space.x = _WindowDimensions.x/2;
+  _InputState.mouse_previous.screen_space.y = _WindowDimensions.y/2;
 }
 
 void _input_update() {

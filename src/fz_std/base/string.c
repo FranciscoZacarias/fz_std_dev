@@ -17,11 +17,29 @@ function String8 string8_concat(Arena* arena, String8 a, String8 b) {
   return result;
 }
 
-function b32 string8_equal(String8 a, String8 b) {
-  if (a.size != b.size)  return false;
-  for(u32 i = 0; i < a.size; i++) {
-    if (a.str[i] != b.str[i])  return false;
+function b32 string8_match(String8 a, String8 b, b32 case_sensitive) {
+  if(a.size != b.size)
+  {
+    return false;
   }
+
+  for(u64 i = 0; i < a.size; i += 1)
+  {
+    u8 ca = a.str[i];
+    u8 cb = b.str[i];
+
+    if(!case_sensitive)
+    {
+      if(ca >= 'A' && ca <= 'Z') ca += 32;
+      if(cb >= 'A' && cb <= 'Z') cb += 32;
+    }
+
+    if(ca != cb)
+    {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -134,9 +152,9 @@ function String8 string8_list_join(Arena* arena, String8_List* list) {
 
 function b32 b32_from_string8(String8 str, b32* value) {
   b32 result = 1;
-  if (string8_equal(str, S("false"))) {
+  if (string8_match(str, S("false"), false)) {
     *value = 0;
-  } else if (string8_equal(str, S("true"))) {
+  } else if (string8_match(str, S("true"), false)) {
     *value = 1;
   } else {
     result = 0;
