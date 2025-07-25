@@ -5,6 +5,15 @@
 #define WINDOW_ENABLED 1
 
 ///////////////////////////////////////////////////////
+// @Section: Window
+
+typedef struct OS_Window_State
+{
+  Vec2S32 dimensions;
+  String8 title;
+} OS_Window_Description;
+
+///////////////////////////////////////////////////////
 // @Section: Window Lifecycle
 function void os_window_open(s32 width, s32 height, String8 title); /* Creates and shows a window */
 function void os_window_close();                                    /* Closes and destroys a window */
@@ -29,11 +38,5 @@ function void os_window_push_custom_edges(f32 thickness);                  /* De
 function void os_window_push_custom_title_bar_client_area(Range2F32 rect); /* Client title bar rect */
 function void os_window_set_position(Vec2F32 pos);                         /* Set window top-left position */
 function void os_window_set_size(s32 width, s32 height);                   /* Set client size (non-fullscreen) */
-
-///////////////////////////////////////////////////////
-// @Section: Window Globals
-global HDC       _DeviceContextHandle  = null;
-global HWND      _WindowHandle         = null;
-global HINSTANCE _hInstance            = null;
 
 #endif // OS_WINDOW_H

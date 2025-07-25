@@ -33,12 +33,12 @@ global W32_SetThreadDescription_Type *w32_SetThreadDescription_func = 0;
 
 ///////////////////////////////////////////////////////
 // @Section: Extern
-
 extern int    __argc;
 extern char** __argv;
 
 ///////////////////////////////////////////////////////
 // @Section: Win32 Globals
+global HINSTANCE _hInstance            = null;
 global WPARAM    _ApplicationReturn    = 0;
 
 global LARGE_INTEGER win32_performance_frequency;

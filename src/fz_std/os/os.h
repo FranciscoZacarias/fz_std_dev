@@ -4,6 +4,18 @@
 #include <stdio.h>
 
 ///////////////////////////////////////////////////////
+// @Section: OS Handles
+typedef struct OS_Handle
+{
+  u64 v[1];
+} OS_Handle;
+
+typedef struct OS_Window
+{
+  OS_Handle handle;
+} OS_Window;
+
+///////////////////////////////////////////////////////
 // @Section: System info
 typedef struct OS_System_Info
 {
@@ -355,7 +367,6 @@ function void entry_point(Command_Line* command_line); /* Application entry poin
 
 ///////////////////////////////////////////////////////
 // @Section: Globals
-global Vec2S32 _WindowDimensions = {0};
 
 global b32 _IgnoreNextMouseMove  = false;
 global b32 _IsCursorLocked       = false;
