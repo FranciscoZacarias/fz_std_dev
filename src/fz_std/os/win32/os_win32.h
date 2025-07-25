@@ -19,12 +19,6 @@ function wchar_t* wchar_from_string8(String8 path);                /* Converts s
 function String8  string8_from_wchar(Arena* arena, wchar_t* wstr); /* Converts a wide char array to a String */
 
 ///////////////////////////////////////////////////////
-// @Section: Window
-
-function HWND _win32_window_create(HINSTANCE hInstance, s32 width, s32 height); /* Creates a win32 window */
-function void _win32_window_resize_callback(s32 width, s32 height);   /* Resize window callback */
-
-///////////////////////////////////////////////////////
 // @Section: Error handling
 
 function LONG WINAPI win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs); /* Win32 exception filer for SetUnhandledExceptionFilter */
@@ -45,13 +39,7 @@ extern char** __argv;
 
 ///////////////////////////////////////////////////////
 // @Section: Win32 Globals
-global HDC       _DeviceContextHandle  = null;
-global HWND      _WindowHandle         = null;
 global WPARAM    _ApplicationReturn    = 0;
-global HINSTANCE _hInstance            = null;
-
-global b32 _IsOpenGLContextEnabled = false;
-global b32 _IsTerminalEnabled      = false;
 
 global LARGE_INTEGER win32_performance_frequency;
 

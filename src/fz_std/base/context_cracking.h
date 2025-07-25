@@ -94,24 +94,12 @@
 # error Compiler not supported.
 #endif
 
-#if defined(ARCH_X64)
-# define ARCH_64BIT 1
-#elif defined(ARCH_X86)
-# define ARCH_32BIT 1
-#endif
-
 #if ARCH_ARM32 || ARCH_ARM64 || ARCH_X64 || ARCH_X86
 # define ARCH_LITTLE_ENDIAN 1
 #else
 # error Endianness of this architecture not understood by context cracker.
 #endif
 
-#if !defined(ARCH_32BIT)
-# define ARCH_32BIT 0
-#endif
-#if !defined(ARCH_64BIT)
-# define ARCH_64BIT 0
-#endif
 #if !defined(ARCH_X64)
 # define ARCH_X64 0
 #endif
