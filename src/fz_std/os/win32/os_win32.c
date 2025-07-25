@@ -510,7 +510,7 @@ os_window_swap_buffers()
     }
   }
 
-  return true;
+  return result;
 }
 
 ///////////////////////////////////////////////////////
