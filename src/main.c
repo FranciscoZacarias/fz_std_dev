@@ -1,6 +1,5 @@
 
 #define ENABLE_ASSERT 1
-#define FZ_WINDOW 1
 #include "fz_base.h"
 #include "fz_window.h"
 

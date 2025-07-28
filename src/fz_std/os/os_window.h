@@ -2,7 +2,6 @@
 #define OS_WINDOW_H
 
 /* fz_std assumes (and therefore only supports) one window. */
-#define WINDOW_ENABLED 1
 
 ///////////////////////////////////////////////////////
 // @Section: Window
