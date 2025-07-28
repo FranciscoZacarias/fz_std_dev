@@ -73,7 +73,7 @@
 #define ERROR_INVALID_PROFILE_ARB                 0x2096
 #endif // WGL_ARB_create_context_profile
 
-typedef BOOL (APIENTRYP PFNwglChoosePixelFormatARBPROC)(
+typedef BOOL (*PFNwglChoosePixelFormatARBPROC)(
   HDC hdc,
   const int *piAttribIList,
   const FLOAT *pfAttribFList,
@@ -82,7 +82,7 @@ typedef BOOL (APIENTRYP PFNwglChoosePixelFormatARBPROC)(
   UINT *nNumFormats
 );
 
-typedef HGLRC (APIENTRYP PFNwglCreateContextAttribsARBPROC)(
+typedef HGLRC (*PFNwglCreateContextAttribsARBPROC)(
   HDC hDC, 
   HGLRC hShareContext, 
   const int 

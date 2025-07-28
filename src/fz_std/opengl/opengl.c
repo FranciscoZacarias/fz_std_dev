@@ -61,14 +61,14 @@ _os_opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity
 function b32
 _os_opengl_load_functions()
 {
-  glUseProgram = (PFNglUseProgramPROC)wglGetProcAddress("glUseProgram");
-  glDebugMessageCallback = (PFNglDebugMessageCallbackPROC)wglGetProcAddress("glDebugMessageCallback");
+  //glUseProgram = (PFNglUseProgramPROC)wglGetProcAddress("glUseProgram");
+  //glDebugMessageCallback = (PFNglDebugMessageCallbackPROC)wglGetProcAddress("glDebugMessageCallback");
 
-  // #define GL_FUNC(ret, name, params) \
-  //   name = (typeof(name))wglGetProcAddress(#name); \
-  //   if (!name) return false;
-  // # include "opengl_functions.inl"
-  // #undef GL_FUNC
+   #define GL_FUNC(ret, name, params) \
+     name = (PFN##name##PROC)wglGetProcAddress(#name); \
+     if (!name) return false;
+   # include "opengl_functions.inl"
+   #undef GL_FUNC
   
   return true;
 }
