@@ -3,7 +3,6 @@
 
 #define true  1
 #define false 0
-#define null  0
 
 #define Stringify_(S) #S
 #define Stringify(S) Stringify_(S)

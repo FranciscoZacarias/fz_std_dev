@@ -26,7 +26,7 @@ string8_from_wchar(Arena* arena, wchar_t* wstr)
     return result;
   }
   
-  // Allocate from arena (subtract 1 to exclude null terminator from size)
+  // Allocate from arena (subtract 1 to exclude NULL terminator from size)
   u8* buffer = array_push(arena, u8, required_size);
   if (!buffer) {
     return result;
@@ -505,11 +505,8 @@ win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs)
 }
 
 function void
-win32_debug_output_last_error(String8 context)
+_win32_output_last_error(DWORD err)
 {
-  DWORD err = GetLastError();
-  if (err == 0) return;
-
   LPWSTR messageBuffer = NULL;
   FormatMessageW(
     FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -529,15 +526,11 @@ win32_debug_output_last_error(String8 context)
       char* messageA = (char*)HeapAlloc(GetProcessHeap(), 0, size_needed);
       if (messageA)
       {
-        Scratch scratch = scratch_begin(0,0);
-        char* cstring_context = cstring_from_string8(scratch.arena, context);
         WideCharToMultiByte(CP_ACP, 0, messageBuffer, -1, messageA, size_needed, NULL, NULL);
-        OutputDebugStringA(cstring_context);
         OutputDebugStringA(": ");
         OutputDebugStringA(messageA);
         OutputDebugStringA("\n");
         HeapFree(GetProcessHeap(), 0, messageA);
-        scratch_end(&scratch);
       }
     }
     LocalFree(messageBuffer);

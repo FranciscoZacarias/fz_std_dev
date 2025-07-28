@@ -255,17 +255,15 @@ os_window_init(s32 width, s32 height, String8 title)
   b32 result = true;
 
   HWND window = _win32_window_create(_hInstance, 600, 600);
+  win32_check_error();
   if (!window)
   {
     printf("Failed to get window handle\n");
-    result = false;
+    return false;
   }
+  
   HDC device_context = GetDC(window);
-  if (!device_context)
-  {
-    printf("Failed to get device context\n");
-    result = false;
-  }
+  win32_check_error();
 
   if (result)
   {
@@ -277,7 +275,6 @@ os_window_init(s32 width, s32 height, String8 title)
         .title      = S("FZ_Window_Title"),
       },
     };
-    g_os_window.handle.v[0] = 1;
 
     _input_init();
     os_resize_callback = _win32_window_resize_callback;
@@ -309,7 +306,7 @@ os_window_swap_buffers()
   os_timer_start(&_Timer_FrameTime);
 
   MSG msg = {0};
-  if (g_os_window_win32.window_handle != null) {
+  if (g_os_window_win32.window_handle != NULL) {
     _input_update();
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
       if (msg.message == WM_QUIT) 
@@ -420,10 +417,7 @@ os_window_set_title(String8 title)
   Scratch scratch = scratch_begin(0, 0);
   char* ctitle = cstring_from_string8(scratch.arena, title);
   b32 result = SetWindowTextA(g_os_window_win32.window_handle, ctitle);
-  if (!result) 
-  {
-    win32_debug_output_last_error(S("CreateWindowExW"));
-  }
+  win32_check_error();
   scratch_end(&scratch);
   return result;
 }
@@ -587,7 +581,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY: 
     {
     #if FZ_OPENGL
-      wglMakeCurrent(null, null);
+      wglMakeCurrent(NULL, NULL);
       wglDeleteContext(_RenderingContextHandle);
     #endif
       ReleaseDC(hWnd, g_os_window_win32.device_context);
@@ -618,11 +612,8 @@ _win32_window_create(HINSTANCE hInstance, s32 width, s32 height)
   DWORD exstyle = WS_EX_APPWINDOW;
   DWORD style   = WS_OVERLAPPEDWINDOW;
   result = CreateWindowExA(exstyle, wc.lpszClassName, "FZ_Window_Title", style, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
+  win32_check_error();
 
-  if (!result) 
-  {
-    win32_debug_output_last_error(S("CreateWindowExA"));
-  }
   return result;
 }
 

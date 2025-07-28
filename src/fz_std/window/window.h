@@ -7,7 +7,6 @@
 // @Section: Window
 typedef struct OS_Window
 {
-  OS_Handle handle;
   Vec2S32 dimensions;
   String8 title;
 } OS_Window;

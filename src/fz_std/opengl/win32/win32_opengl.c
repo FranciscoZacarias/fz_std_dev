@@ -3,6 +3,8 @@ os_opengl_init()
 {
   b32 result = true;
 
+  _win32_load_webgl_functions();
+
   // set pixel format for OpenGL context
   {
     int attrib[] = {
@@ -28,16 +30,16 @@ os_opengl_init()
 
     int format;
     UINT formats;
-    if (!wglChoosePixelFormatARB(_DeviceContextHandle, attrib, NULL, 1, &format, &formats) || formats == 0)
+    if (!wglChoosePixelFormatARB(g_os_window_win32.device_context, attrib, NULL, 1, &format, &formats) || formats == 0)
     {
-        printf("OpenGL does not support required pixel format!");
+      printf("OpenGL does not support required pixel format!");
     }
 
     PIXELFORMATDESCRIPTOR desc = { .nSize = sizeof(desc) };
-    int ok = DescribePixelFormat(_DeviceContextHandle, format, sizeof(desc), &desc);
+    int ok = DescribePixelFormat(g_os_window_win32.device_context, format, sizeof(desc), &desc);
     Assert(ok && "Failed to describe OpenGL pixel format");
 
-    if (!SetPixelFormat(_DeviceContextHandle, format, &desc))
+    if (!SetPixelFormat(g_os_window_win32.device_context, format, &desc))
     {
       printf("Cannot set OpenGL selected pixel format!");
     }
@@ -57,20 +59,19 @@ os_opengl_init()
       0,
     };
 
-    HGLRC rc = wglCreateContextAttribsARB(_DeviceContextHandle, NULL, attrib);
+    HGLRC rc = wglCreateContextAttribsARB(g_os_window_win32.device_context, NULL, attrib);
     if (!rc) {
       printf("Cannot create modern OpenGL context! OpenGL version 4.5 not supported?");
     }
 
-    result = wglMakeCurrent(_DeviceContextHandle, rc);
+    result = wglMakeCurrent(g_os_window_win32.device_context, rc);
+    win32_check_error();
     Assert(result && "Failed to make current OpenGL context");
 
-    if (!gladLoadGL()) {
-      printf("Failed to load OpenGL functions with glad!");
-    }
+    _os_opengl_load_functions();
 
     // enable debug callback
-    glDebugMessageCallback(&opengl_debug_callback, NULL);
+    glDebugMessageCallback(&_os_opengl_debug_callback, NULL);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
   }
 
@@ -78,13 +79,7 @@ os_opengl_init()
 }
 
 function void
-_os_opengl_load_functions()
-{
-
-}
-
-function void
-_os_opengl_get_webgl_functions()
+_win32_load_webgl_functions()
 {
   // to get WGL functions we need valid GL context, so create dummy window for dummy GL context
   HWND dummy = CreateWindowExW(
@@ -126,9 +121,21 @@ _os_opengl_get_webgl_functions()
   Assert(ok && "Failed to make current OpenGL context for dummy window");
 
   {
-    //
-    // Load Webgl extensions
-    //
+    wglChoosePixelFormatARB = (PFNwglChoosePixelFormatARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+    if (!wglChoosePixelFormatARB)
+    {
+      printf("Not loaded");
+    }
+
+    wglCreateContextAttribsARB = (PFNwglCreateContextAttribsARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+    if (!wglCreateContextAttribsARB)
+    {
+      printf("Not loaded");
+    }
+
+    // #define WGL_FUNC(ret, name, params) name = (typeof(name))wglGetProcAddress(#name);
+    // # include "wgl_functions.inl"
+    // #undef WGL_FUNC
   }
 
   wglMakeCurrent(NULL, NULL);

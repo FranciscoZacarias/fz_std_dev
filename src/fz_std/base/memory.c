@@ -5,7 +5,7 @@ function Arena* arena_alloc() {
 }
 
 function Arena* arena_alloc_sized(u64 reserve, u64 commit) {
-  void* memory = null;
+  void* memory = NULL;
   
   u64 page_size = os_memory_get_page_size();
   reserve = AlignPow2(reserve, page_size);
@@ -15,7 +15,7 @@ function Arena* arena_alloc_sized(u64 reserve, u64 commit) {
   
   memory = os_memory_reserve(reserve);
   if(!os_memory_commit(memory, commit)) {
-    memory = null;
+    memory = NULL;
     os_memory_release(memory, reserve);
   }
   
@@ -43,7 +43,7 @@ _arena_push(Arena* arena, u64 size) {
 
 function void*
 _arena_push_no_zero(Arena* arena, u64 size) {
-  void* result = null;
+  void* result = NULL;
 
   if (arena->position + size <= arena->reserved) {
     u64 position_memory = AlignPow2(arena->position, arena->align);

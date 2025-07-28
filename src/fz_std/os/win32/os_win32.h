@@ -21,7 +21,8 @@ function String8  string8_from_wchar(Arena* arena, wchar_t* wstr); /* Converts a
 ///////////////////////////////////////////////////////
 // @Section: Error handling
 function LONG WINAPI win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs); /* Win32 exception filer for SetUnhandledExceptionFilter */
-function void win32_debug_output_last_error(String8 context);
+function void _win32_output_last_error(DWORD error);
+#define win32_check_error() Statement(DWORD e = GetLastError(); if (e != 0) { _win32_output_last_error(e); })
 
 ///////////////////////////////////////////////////////
 // @Section: Modern Windows SDK functions
@@ -36,7 +37,7 @@ extern char** __argv;
 
 ///////////////////////////////////////////////////////
 // @Section: Win32 Globals
-global HINSTANCE _hInstance            = null;
+global HINSTANCE _hInstance            = NULL;
 global WPARAM    _ApplicationReturn    = 0;
 
 global LARGE_INTEGER win32_performance_frequency;
