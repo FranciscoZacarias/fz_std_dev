@@ -15,7 +15,7 @@ entry_point()
   os_window_open();
   os_console_init();
 
-  while(1)
+  for (;;)
   {
 
     os_window_swap_buffers();
