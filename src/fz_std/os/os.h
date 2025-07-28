@@ -1,8 +1,6 @@
 #ifndef OS_INCLUDE_H
 #define OS_INCLUDE_H
 
-#include <stdio.h>
-
 ///////////////////////////////////////////////////////
 // @Section: OS Handles
 typedef struct OS_Handle

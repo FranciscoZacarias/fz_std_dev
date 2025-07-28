@@ -4,18 +4,21 @@
 Basic structure:
 
 ```c
-#include "fz_include.h"
+#include "fz_base.h" // Required
+#include "fz_window.h" // Launches window (requires base)
+#include "fz_opengl.h" // Attaches opengl context to window (requires window)
 
-internal void entry_point() {
-  win32_init();
-  win32_enable_window();
-  win32_enable_opengl();
-  win32_show_window(true);
+function void
+entry_point()
+{
+  os_window_init(400, 400, S("asd"));
+  os_window_open();
+  os_console_init();
 
-  while (win32_application_is_running()) {
+  while(1)
+  {
 
-    // ...
-
+    os_window_swap_buffers();
   }
 }
 ```

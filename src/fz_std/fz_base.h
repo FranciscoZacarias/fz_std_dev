@@ -9,8 +9,10 @@ Must be in every project:
   - The base layer should have no dependencies, apart from the core os layer, which obviously requires the underlying OS implementations.
 
 Additional modules 
-  - fz_window.h
-  - fZ_opengl.h
+  #include "fz_window.h"
+    - Enables window API
+    - Only supports 1 window
+  #include "fz_opengl.h"
 
 Macros:
   - ENABLE_ASSERT 
@@ -23,6 +25,11 @@ Macros:
 
 #define FZ_BASE 1
 
+///////////////////////////////////////////////////////
+// @Section: System includes
+#include <stdio.h>
+
+///////////////////////////////////////////////////////
 // @Section: *.h
 #include "base\context_cracking.h"
 #include "base\core.h" 
@@ -34,6 +41,7 @@ Macros:
 #include "base\entry_point.h"
 #include "os\os.h"
 
+///////////////////////////////////////////////////////
 // @Section: *.c
 #include "base\memory.c"
 #include "base\math.c"

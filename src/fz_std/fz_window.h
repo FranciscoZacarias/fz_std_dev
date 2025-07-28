@@ -6,16 +6,16 @@
 #endif
 #define FZ_WINDOW 1
 
-#include "os\os_window.h"
+#include "window\window.h"
 #if OS_WINDOWS
-# include "os\win32\os_win32_window.h"
+# include "window\win32\win32_window.h"
 #elif OS_LINUX
 # error fz_window for linux os not implemented
 #endif
 
-#include "os\os_window.c"
+#include "window\window.c"
 #if OS_WINDOWS
-# include "os\win32\os_win32_window.c"
+# include "window\win32\win32_window.c"
 #elif OS_LINUX
 # error fz_window for linux os not implemented
 #endif
