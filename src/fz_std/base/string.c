@@ -73,7 +73,7 @@ function String8_List string8_split(Arena* arena, String8 str, String8 split_cha
   String8_List result = { 0 };
   
   if (split_character.size != 1) {
-    ERROR_MESSAGE_AND_EXIT("string8_split expects only one char8acter in split_character. It got %s of size %llu\n", split_character.str, split_character.size);
+    printf("string8_split expects only one char8acter in split_character. It got %s of size %llu\n", split_character.str, split_character.size);
   }
   
   u8* cursor = str.str;

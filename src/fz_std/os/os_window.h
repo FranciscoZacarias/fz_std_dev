@@ -6,18 +6,21 @@
 
 ///////////////////////////////////////////////////////
 // @Section: Window
-
-typedef struct OS_Window_State
+typedef struct OS_Window
 {
+  OS_Handle handle;
   Vec2S32 dimensions;
   String8 title;
-} OS_Window_Description;
+} OS_Window;
+global OS_Window g_os_window;
 
 ///////////////////////////////////////////////////////
 // @Section: Window Lifecycle
-function void os_window_open(s32 width, s32 height, String8 title); /* Creates and shows a window */
-function void os_window_close();                                    /* Closes and destroys a window */
-function b32  os_window_swap_buffers();                             /* Swaps buffers for the only existing window */
+function b32       os_window_init(s32 width, s32 height, String8 title); /* Creates a window */
+function void      os_window_open();                                     /* Shows a window */
+function void      os_window_close();                                    /* Closes and destroys a window */
+function b32       os_window_swap_buffers();                             /* Swaps buffers for the only existing window */
+function OS_Window os_window_get();                                      /* Returns the window handle */
 
 ///////////////////////////////////////////////////////
 // @Section: Window Flags

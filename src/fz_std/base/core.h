@@ -22,7 +22,7 @@
 
 #if !defined(AssertBreak)
 # if defined(OS_WINDOWS)
-#  define AssertBreak(condition) Statement(if (!(condition)) { ERROR_MESSAGE_AND_EXIT("Assert Failed\nExpression: %s", Stringify(condition)); })
+#  define AssertBreak(condition) Breakpoint()
 # else
 #  define AssertBreak(condition) (*(volatile int*)0 = 0)
 # endif

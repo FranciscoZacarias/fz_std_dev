@@ -28,7 +28,7 @@ function Arena* arena_alloc_sized(u64 reserve, u64 commit) {
     arena->position    = ARENA_HEADER_SIZE;
     arena->align       = DEFAULT_ALIGNMENT;
   } else {
-    ERROR_MESSAGE_AND_EXIT("Error setting arena's memory");
+    printf("Error setting arena's memory");
   }
   
   return arena;
@@ -56,13 +56,13 @@ _arena_push_no_zero(Arena* arena, u64 size) {
       if (os_memory_commit((u8*)arena + arena->commited, commit_size)) {
         arena->commited = commit_clamped;
       } else {
-        ERROR_MESSAGE_AND_EXIT("Could not commit memory when increasing the arena's committed memory.");
+        printf("Could not commit memory when increasing the arena's committed memory.");
       }
     }
     result = (u8*)arena + position_memory;
     arena->position = new_position;
   } else {
-    ERROR_MESSAGE_AND_EXIT("Trying to allocate too much memory to a non dynamic arena.\nSize: %llu\nArena->Position: %llu\nArena->reserved: %llu\nArena->Position+Size: %llu", size, arena->position, arena->reserved, arena->position+size);
+    printf("Trying to allocate too much memory to a non dynamic arena.\nSize: %llu\nArena->Position: %llu\nArena->reserved: %llu\nArena->Position+Size: %llu", size, arena->position, arena->reserved, arena->position+size);
   }
   
   return result;

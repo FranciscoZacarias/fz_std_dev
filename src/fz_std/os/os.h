@@ -10,11 +10,6 @@ typedef struct OS_Handle
   u64 v[1];
 } OS_Handle;
 
-typedef struct OS_Window
-{
-  OS_Handle handle;
-} OS_Window;
-
 ///////////////////////////////////////////////////////
 // @Section: System info
 typedef struct OS_System_Info
@@ -373,6 +368,11 @@ global b32 _IsCursorLocked       = false;
 
 global Performance_Timer _Timer_FrameTime   = {0};
 global Performance_Timer _Timer_ElapsedTime = {0};
+
+///////////////////////////////////////////////////////
+// @Section: Window
+typedef void (*WindowResizeCallback)(s32 width, s32 height);
+global WindowResizeCallback os_resize_callback;
 
 ///////////////////////////////////////////////////////
 // @Section: OS-Dependent headers

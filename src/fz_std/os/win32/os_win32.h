@@ -20,14 +20,12 @@ function String8  string8_from_wchar(Arena* arena, wchar_t* wstr); /* Converts a
 
 ///////////////////////////////////////////////////////
 // @Section: Error handling
-
 function LONG WINAPI win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs); /* Win32 exception filer for SetUnhandledExceptionFilter */
 function void win32_debug_output_last_error(String8 context);
 
 ///////////////////////////////////////////////////////
 // @Section: Modern Windows SDK functions
 // rfj: We must dynamically link to them, since they can be missing in older SDKs
-
 typedef HRESULT W32_SetThreadDescription_Type(HANDLE hThread, PCWSTR lpThreadDescription);
 global W32_SetThreadDescription_Type *w32_SetThreadDescription_func = 0;
 

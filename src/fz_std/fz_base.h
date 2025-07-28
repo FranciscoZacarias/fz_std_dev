@@ -9,8 +9,8 @@ Must be in every project:
   - The base layer should have no dependencies, apart from the core os layer, which obviously requires the underlying OS implementations.
 
 Additional modules 
-  - os_window.h
-  - opengl_backend.h
+  - fz_window.h
+  - fZ_opengl.h
 
 Macros:
   - ENABLE_ASSERT 
@@ -21,8 +21,7 @@ Macros:
 
 #pragma warning(disable: 4201) // NOTE(fz): nonstandard extension used: nameless struct/union
 
-#define FZ_STD 1
-#define ERROR_MESSAGE_AND_EXIT(...) // TODO(fz): implement proper error handling.
+#define FZ_BASE 1
 
 // @Section: *.h
 #include "base\context_cracking.h"
