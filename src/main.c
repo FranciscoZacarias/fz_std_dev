@@ -13,7 +13,7 @@ entry_point(Command_Line* command_line)
   os_window_open();
   os_console_init();
 
-  while()
+  while(1)
   {
 
     os_window_swap_buffers();
