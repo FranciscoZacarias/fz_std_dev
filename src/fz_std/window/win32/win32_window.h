@@ -6,8 +6,9 @@
 typedef struct OS_Window_Win32
 {
   OS_Window state;
-  HWND window_handle;
-  HDC  device_context;
+  HGLRC rendering_context;
+  HWND  window_handle;
+  HDC   device_context;
 } OS_Window_Win32;
 
 global OS_Window_Win32 g_os_window_win32;

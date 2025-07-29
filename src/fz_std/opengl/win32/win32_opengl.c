@@ -61,14 +61,14 @@ os_opengl_init()
       0,
     };
 
-    HGLRC rc = wglCreateContextAttribsARB(g_os_window_win32.device_context, NULL, attrib);
-    if (!rc)
+    g_os_window_win32.rendering_context = wglCreateContextAttribsARB(g_os_window_win32.device_context, NULL, attrib);
+    if (!g_os_window_win32.rendering_context)
     {
       printf("Cannot create modern OpenGL context! OpenGL version 4.6 not supported?");
       return false;
     }
 
-    result = wglMakeCurrent(g_os_window_win32.device_context, rc);
+    result = wglMakeCurrent(g_os_window_win32.device_context, g_os_window_win32.rendering_context);
     win32_check_error();
     Assert(result && "Failed to make current OpenGL context");
 
@@ -86,6 +86,13 @@ os_opengl_init()
   }
 
   return result;
+}
+
+function void
+os_opengl_end()
+{
+  wglMakeCurrent(NULL, NULL);
+  wglDeleteContext(g_os_window_win32.rendering_context);
 }
 
 function b32

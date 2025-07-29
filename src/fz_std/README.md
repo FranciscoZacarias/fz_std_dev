@@ -14,15 +14,15 @@ entry_point(Command_Line* command_line)
 {
   Arena* arena = arena_alloc();
 
-  os_console_init();
-  os_window_init(400, 400, S("asd"));
-  os_window_open();
-  os_opengl_init();
+  os_console_init(); // Available with fz_base.h
+  os_window_init(400, 400, S("asd")); // Available with fz_window.h
+  os_window_open(); // Available with fz_window.h
+  os_opengl_init(); // Available with fz_opengl.h
 
-  for(;;)
+  while(g_is_program_running) // g_is_program_running is Available with fz_base.h
   {
 
-    os_window_swap_buffers();
+    os_window_swap_buffers(); // Available with window.h
   }
 }
 

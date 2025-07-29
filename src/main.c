@@ -14,7 +14,7 @@ entry_point(Command_Line* command_line)
   os_window_open();
   os_opengl_init();
 
-  for(;;)
+  while(g_is_program_running)
   {
 
     os_window_swap_buffers();

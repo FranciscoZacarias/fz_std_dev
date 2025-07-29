@@ -308,17 +308,18 @@ os_window_swap_buffers()
   MSG msg = {0};
   if (g_os_window_win32.window_handle != NULL) {
     _input_update();
-    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
       if (msg.message == WM_QUIT) 
       {
         _ApplicationReturn = (s32)msg.wParam;
         result = false;
+        g_is_program_running = false;
       }
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
+    SwapBuffers(g_os_window_win32.device_context);
   }
-
   return result;
 }
 
@@ -465,7 +466,6 @@ os_window_set_size(s32 width, s32 height)
 ///////////////////////////////////////////////////////
 // @Section: Window - OS Dependent
 
-
 LRESULT CALLBACK 
 WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -580,10 +580,6 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_DESTROY: 
     {
-    #if FZ_OPENGL
-      wglMakeCurrent(NULL, NULL);
-      wglDeleteContext(_RenderingContextHandle);
-    #endif
       ReleaseDC(hWnd, g_os_window_win32.device_context);
       PostQuitMessage(0);
       return 0;

@@ -318,6 +318,9 @@ typedef struct Input_State
 
 global Input_State _InputState;
 
+global b32 _IgnoreNextMouseMove = false;
+global b32 _IsCursorLocked      = false;
+
 function void _input_init();   /* Initializes input state (clears previous + current states) */
 function void _input_update(); /* Updates previous input state with current state (to track deltas and transitions) */
 
@@ -361,8 +364,7 @@ function void entry_point(Command_Line* command_line); /* Application entry poin
 ///////////////////////////////////////////////////////
 // @Section: Globals
 
-global b32 _IgnoreNextMouseMove  = false;
-global b32 _IsCursorLocked       = false;
+global b32 g_is_program_running = true;
 
 global Performance_Timer _Timer_FrameTime   = {0};
 global Performance_Timer _Timer_ElapsedTime = {0};

@@ -18,12 +18,13 @@ typedef void (*GLDEBUGPROC)(GLenum source, GLenum type, GLuint id, GLenum severi
 
 ///////////////////////////////////////////////////////
 // @Section: Opengl entry point
-function b32 os_opengl_init(); /* Initializes opengl context */
+function b32  os_opengl_init(); /* Initializes opengl context */
+function void os_opengl_end();  /* Deletes opengl context */
 
 ///////////////////////////////////////////////////////
 // @Section: Opengl helpers
-function void APIENTRY _os_opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *user); /* Opengl debug callback */
-function void*         _load_gl_function(const char *name);                                                                                                        /* Helper to load a single opengl function */
-function b32           _os_opengl_load_functions();                                                                                                                /* Loads opengl function pointers */
+function void  APIENTRY _os_opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *user); /* Opengl debug callback */
+function void*          _load_gl_function(const char *name);                                                                                                        /* Helper to load a single opengl function */
+function b32            _os_opengl_load_functions();                                                                                                                /* Loads opengl function pointers */
 
 #endif // OS_OPENGL_H
