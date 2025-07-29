@@ -55,7 +55,8 @@ command_line_parse_token(u8** cursor)
     end = start;
     while (*end && *end != '"') end++;
     *cursor = (*end == '"') ? end + 1 : end;
-  } else
+  }
+  else
   {
     while (*end && !char8_is_space(*end)) end++;
     *cursor = end;

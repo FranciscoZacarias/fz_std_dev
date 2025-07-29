@@ -1,14 +1,20 @@
-function String8 string8_new(u64 size, u8* str) {
+function String8
+string8_new(u64 size, u8* str)
+{
   String8 result = { size, str };
   return result;
 }
 
-function String8 string8_range(u8* first, u8* range) {
+function String8
+string8_range(u8* first, u8* range)
+{
   String8 result = (String8){(u64)(range - first), first};
   return result;
 }
 
-function String8 string8_concat(Arena* arena, String8 a, String8 b) {
+function String8
+string8_concat(Arena* arena, String8 a, String8 b)
+{
   String8 result = { 0 };
   result.size = a.size + b.size;
   result.str = array_push(arena, u8, result.size);
@@ -17,7 +23,9 @@ function String8 string8_concat(Arena* arena, String8 a, String8 b) {
   return result;
 }
 
-function b32 string8_match(String8 a, String8 b, b32 case_sensitive) {
+function b32
+string8_match(String8 a, String8 b, b32 case_sensitive)
+{
   if(a.size != b.size)
   {
     return false;
@@ -43,19 +51,25 @@ function b32 string8_match(String8 a, String8 b, b32 case_sensitive) {
   return true;
 }
 
-function String8 string8_slice(String8 str, u64 start, u64 end) {
+function String8
+string8_slice(String8 str, u64 start, u64 end)
+{
   if (start > str.size) start = str.size;
   if (end > str.size)   end   = str.size;
   if (start > end)      start = end;
   return (String8){ .size = end - start, .str  = str.str + start };
 }
 
-function b32 string8_find_last(String8 str, String8 substring, u64* index) {
+function b32
+string8_find_last(String8 str, String8 substring, u64* index)
+{
   if (substring.size > str.size) return 0;
   b32 result = false;
   *index = U64_MAX;
-  for (u64 i = str.size - substring.size + 1; i-- > 0;) {
-    if (MemoryMatch(&str.str[i], substring.str, substring.size)) {
+  for (u64 i = str.size - substring.size + 1; i-- > 0;)
+  {
+    if (MemoryMatch(&str.str[i], substring.str, substring.size))
+    {
       *index = i;
       result = true;
       break;
@@ -64,33 +78,41 @@ function b32 string8_find_last(String8 str, String8 substring, u64* index) {
   return result;
 }
 
-function void string8_printf(String8 str) {
+function void
+string8_printf(String8 str)
+{
   printf("%.*s", (s32)str.size, str.str);
 }
 
-
-function String8_List string8_split(Arena* arena, String8 str, String8 split_character) {
+function String8_List
+string8_split(Arena* arena, String8 str, String8 split_character)
+{
   String8_List result = { 0 };
-  
-  if (split_character.size != 1) {
+  if (split_character.size != 1)
+  {
     printf("string8_split expects only one char8acter in split_character. It got %s of size %llu\n", split_character.str, split_character.size);
   }
-  
-  u8* cursor = str.str;
-  u8* end    = str.str + str.size;
-  for(; cursor < end; cursor++) {
-    u8 byte  = *cursor;
-    if (byte == split_character.str[0]) {
-      string8_list_push(arena, &result, string8_range(str.str, cursor));
-      string8_list_push(arena, &result, string8_range(cursor, end));
-      break;
+  else
+  {
+    u8* cursor = str.str;
+    u8* end    = str.str + str.size;
+    for(; cursor < end; cursor++)
+    {
+      u8 byte  = *cursor;
+      if (byte == split_character.str[0])
+      {
+        string8_list_push(arena, &result, string8_range(str.str, cursor));
+        string8_list_push(arena, &result, string8_range(cursor, end));
+        break;
+      }
     }
   }
-  
   return result;
 }
 
-function String8_List string8_list_new(Arena* arena, String8 str) {
+function String8_List
+string8_list_new(Arena* arena, String8 str)
+{
   String8_List result = {0};
   String8_Node* node = array_push(arena, String8_Node, 1);
   result.first = node;
@@ -100,7 +122,9 @@ function String8_List string8_list_new(Arena* arena, String8 str) {
   return result;
 }
 
-function String8 string8_list_pop(String8_List* list) {
+function String8
+string8_list_pop(String8_List* list)
+{
   String8 result = {0};
   if (list->node_count < 1)  return result;
   
@@ -108,13 +132,17 @@ function String8 string8_list_pop(String8_List* list) {
   result            = last_node->value;
   list->total_size -= last_node->value.size;
 
-  if (list->node_count == 1) {
+  if (list->node_count == 1)
+  {
     list->first = 0;
     list->last = 0;
     list->node_count = 0;
-  } else {
+  }
+  else
+  {
     String8_Node* current = list->first;
-    while (current->next != last_node) {
+    while (current->next != last_node)
+    {
       current = current->next;
     }
     current->next = 0;
@@ -122,17 +150,21 @@ function String8 string8_list_pop(String8_List* list) {
     list->node_count -= 1;
   }
 
-return result;
+  return result;
 }
 
-function void string8_list_push(Arena* arena, String8_List* list, String8 str) {
+function void
+string8_list_push(Arena* arena, String8_List* list, String8 str)
+{
   String8_Node* node = array_push(arena, String8_Node, sizeof(String8_Node));
-  
   node->value = str;
-  if (!list->first && !list->last) {
+  if (!list->first && !list->last)
+  {
     list->first = node;
     list->last  = node;
-  } else {
+  }
+  else
+  {
     list->last->next = node;
     list->last       = node;
   }
@@ -140,72 +172,102 @@ function void string8_list_push(Arena* arena, String8_List* list, String8 str) {
   list->total_size += node->value.size;
 }
 
-function String8 string8_list_join(Arena* arena, String8_List* list) {
+function String8
+string8_list_join(Arena* arena, String8_List* list)
+{
   u8* dst = array_push(arena, u8, list->total_size);
   u8* ptr = dst;
-  for (String8_Node* node = list->first; node; node = node->next) {
+  for (String8_Node* node = list->first; node; node = node->next)
+  {
     MemoryCopy(ptr, node->value.str, node->value.size);
     ptr += node->value.size;
   }
   return string8_new(list->total_size, dst);
 }
 
-function b32 b32_from_string8(String8 str, b32* value) {
+function b32
+b32_from_string8(String8 str, b32* value)
+{
   b32 result = 1;
-  if (string8_match(str, S("false"), false)) {
+  if (string8_match(str, S("false"), false))
+  {
     *value = 0;
-  } else if (string8_match(str, S("true"), false)) {
+  }
+  else if (string8_match(str, S("true"), false))
+  {
     *value = 1;
-  } else {
+  }
+  else
+  {
     result = 0;
   }
   return result;
 }
 
-function b32 f32_from_string8(String8 str, f32* value) {
+function b32
+f32_from_string8(String8 str, f32* value)
+{
   *value = 0.0f;
   s32 decimal_position = -1;
   
-  for (u64 i = 0; i < str.size; i++) {
-    if (str.str[i] >= '0'  && str.str[i] <= '9') {
+  for (u64 i = 0; i < str.size; i++)
+  {
+    if (str.str[i] >= '0'  && str.str[i] <= '9')
+    {
       *value = *value * 10.0f + (str.str[i] - '0');
-      if (decimal_position != -1) {
+      if (decimal_position != -1)
+      {
         decimal_position += 1;
       }
-    } else if (str.str[i] == '.') {
+    } 
+    else if (str.str[i] == '.')
+    {
       decimal_position = 0;
-    } else {
+    }
+    else
+    {
       return 0;
     }
   }
   
-  if (decimal_position != -1) {
+  if (decimal_position != -1)
+  {
     *value = *value / (f32)pow(10, decimal_position);
   }
   
   return 1;
 }
 
-function b32 s32_from_string8(String8 str, s32* value) {
+function b32
+s32_from_string8(String8 str, s32* value)
+{
   *value = 0.0f;
-  for (u64 i = 0; i < str.size; i++) {
-    if (str.str[i] >= '0'  && str.str[i] <= '9') {
+  for (u64 i = 0; i < str.size; i++)
+  {
+    if (str.str[i] >= '0'  && str.str[i] <= '9')
+    {
       *value = *value * 10.0f + (str.str[i] - '0');
-    } else {
+    }
+    else
+    {
       return 0;
     }
   }
   return 1;
 }
 
-function u8* cstring_from_string8(Arena* arena, String8 str) {
+function u8*
+cstring_from_string8(Arena* arena, String8 str)
+{
   u8* result = array_push(arena, u8, str.size + 1);
   MemoryCopy(result, str.str, str.size);
   result[str.size] = 0;
   return result;
 }
 
-function String8 string8_from_cstring(u8* cstring) {
+function String8
+string8_from_cstring(u8* cstring)
+{
   String8 result = string8_new((u64)strlen(cstring), cstring);
   return result;
 }
@@ -219,27 +281,39 @@ cstring_length(u8* cstring)
 }
 
 //~ Char Functions
-function b32 char8_is_alpha(u8 c) {
+function b32
+char8_is_alpha(u8 c)
+{
   return char8_is_alpha_upper(c) || char8_is_alpha_lower(c);
 }
 
-function b32 char8_is_alphanum(u8 c) {
+function b32
+char8_is_alphanum(u8 c)
+{
   return char8_is_alpha(c) || char8_is_digit(c);
 }
 
-function b32 char8_is_alpha_upper(u8 c) {
+function b32
+char8_is_alpha_upper(u8 c)
+{
   return c >= 'A' && c <= 'Z';
 }
 
-function b32 char8_is_alpha_lower(u8 c) {
+function b32
+char8_is_alpha_lower(u8 c)
+{
   return c >= 'a' && c <= 'z';
 }
 
-function b32 char8_is_digit(u8 c) {
+function b32
+char8_is_digit(u8 c)
+{
   return c >= '1' && c <= '9';
 }
 
-function b32 char8_is_symbol(u8 c) {
+function b32
+char8_is_symbol(u8 c)
+{
   return (c == '~' || c == '!'  || c == '$' || c == '%' || c == '^' ||
           c == '&' || c == '*'  || c == '-' || c == '=' || c == '+' ||
           c == '<' || c == '.'  || c == '>' || c == '/' || c == '?' ||
@@ -248,14 +322,20 @@ function b32 char8_is_symbol(u8 c) {
           c == ',' || c == ';'  || c == ':' || c == '@');
 }
 
-function b32 char8_is_space(u8 c) {
+function b32
+char8_is_space(u8 c)
+{
   return c == ' ' || c == '\r' || c == '\t' || c == '\f' || c == '\v' || c == '\n';
 }
 
-function u8 char8_to_upper(u8 c) {
+function u8
+char8_to_upper(u8 c)
+{
   return (c >= 'a' && c <= 'z') ? ('A' + (c - 'a')) : c;
 }
 
-function u8 char8_to_lower(u8 c) {
+function u8
+char8_to_lower(u8 c)
+{
   return (c >= 'A' && c <= 'Z') ? ('a' + (c - 'A')) : c;
 }

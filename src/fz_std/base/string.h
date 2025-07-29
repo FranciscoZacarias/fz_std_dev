@@ -54,7 +54,7 @@ function b32 char8_is_alpha_lower(u8 c);
 function b32 char8_is_digit(u8 c);
 function b32 char8_is_symbol(u8 c);
 function b32 char8_is_space(u8 c);
-function u8 char8_to_upper(u8 c);
-function u8 char8_to_lower(u8 c);
+function u8  char8_to_upper(u8 c);
+function u8  char8_to_lower(u8 c);
 
 #endif // STRING_H
