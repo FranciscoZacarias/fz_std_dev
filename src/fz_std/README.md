@@ -14,16 +14,16 @@ entry_point(Command_Line* command_line)
 {
   Arena* arena = arena_alloc();
 
-  os_console_init(); // Available with fz_base.h
-  os_window_init(400, 400, S("My Window")); // Available with fz_window.h
-  os_window_open(); // Available with fz_window.h
-  os_opengl_init(); // Available with fz_opengl.h
+  os_console_init();
+  os_window_init(400, 400, S("asd"));
+  os_window_open();
+  os_opengl_init();
 
-  while(g_is_program_running) // g_is_program_running is Available with fz_base.h
+  while(g_is_program_running)
   {
-
-    os_window_swap_buffers(); // Available with window.h
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    os_window_swap_buffers();
   }
 }
-
 ```
