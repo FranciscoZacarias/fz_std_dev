@@ -252,28 +252,26 @@ _os_key_from_native_key(u32 native_key)
 function b32
 os_window_init(s32 width, s32 height, String8 title)
 {
+  MemoryZeroStruct(&g_os_window_win32);
   b32 result = true;
 
-  HWND window = _win32_window_create(_hInstance, width, height, title);
-  win32_check_error();
-  if (!IsWindow(window))
+  g_os_window_win32.window_handle = _win32_window_create(_hInstance, width, height, title);
+  if (!IsWindow(g_os_window_win32.window_handle))
   {
-    printf("Failed to get window handle\n");
-    return false;
+    win32_check_error();
+    emit_error(S("Failed to get window handle\n"));
   }
   
-  HDC device_context = GetDC(window);
-  win32_check_error();
+  g_os_window_win32.device_context = GetDC(g_os_window_win32.window_handle);
+  if (!g_os_window_win32.device_context)
+  {
+    win32_check_error();
+    emit_error(S("Failed to get device context"));
+  }
 
-  g_os_window_win32 = (OS_Window_Win32) {
-    .window_handle  = window,
-    .device_context = device_context,
-    .state = {
-      .dimensions = {width, height},
-      .title      = S("FZ_Window_Title"),
-    },
-  };
-
+  g_os_window_win32.state.dimensions = (Vec2S32){width, height};
+  g_os_window_win32.state.title      = S("FZ_Window_Title");
+  
   _input_init();
   os_resize_callback = _win32_window_resize_callback;
 
@@ -306,7 +304,7 @@ os_is_application_running()
   if (g_os_window_win32.window_handle != NULL)
   {
     _input_update();
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
       if (msg.message == WM_QUIT) 
       {
@@ -403,11 +401,7 @@ os_window_set_minimized(b32 set)
 function void
 os_swap_buffers()
 {
-  if (!SwapBuffers(g_os_window_win32.device_context))
-  {
-    win32_check_error();
-    emit_fatal(S("Failed to swap buffers."));
-  }
+  SwapBuffers(g_os_window_win32.device_context);
 }
 
 ///////////////////////////////////////////////////////
@@ -479,12 +473,6 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message) 
   {
-    case WM_PAINT:
-    {
-      printf("wm_paint");
-    }
-    break;
-
     case WM_SETCURSOR:
     {
       if (LOWORD(lParam) == HTCLIENT) 
@@ -606,7 +594,6 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 function HWND
 _win32_window_create(HINSTANCE hInstance, s32 width, s32 height, String8 title)
 {
-  HWND result = {0};
   WNDCLASSEXA wc = 
   {
     .cbSize        = sizeof(wc),
@@ -624,8 +611,12 @@ _win32_window_create(HINSTANCE hInstance, s32 width, s32 height, String8 title)
   DWORD style   = WS_OVERLAPPEDWINDOW;
 
   Scratch scratch = scratch_begin(0, 0);
-  result = CreateWindowExA(exstyle, wc.lpszClassName, cstring_from_string8(scratch.arena, title), style, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
-  win32_check_error();
+  HWND result = CreateWindowExA(exstyle, wc.lpszClassName, cstring_from_string8(scratch.arena, title), style, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
+  if (!result)
+  {
+    win32_check_error();
+    emit_fatal(S("Error creating Win32 window."));
+  }
 
   scratch_end(&scratch);
   return result;

@@ -1,8 +1,6 @@
 function b32
 os_opengl_init()
 {
-  b32 result = true;
-
   if (!_win32_load_wgl_functions())
   {
     emit_fatal(S("Failed to load wgl functions."));
@@ -10,7 +8,8 @@ os_opengl_init()
 
   // set pixel format for OpenGL context
   {
-    int attrib[] = {
+    int attrib[] =
+    {
       WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
       WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
       WGL_DOUBLE_BUFFER_ARB,  GL_TRUE,
@@ -38,16 +37,32 @@ os_opengl_init()
       emit_fatal(S("OpenGL does not support required pixel format!"));
     }
 
-    PIXELFORMATDESCRIPTOR desc = {
-      sizeof(PIXELFORMATDESCRIPTOR), 1,
-      PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-      PFD_TYPE_RGBA, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 8, 0,
-      PFD_MAIN_PLANE, 0, 0, 0, 0
-    };
-    if (!DescribePixelFormat(g_os_window_win32.device_context, format, sizeof(desc), &desc))
+    PIXELFORMATDESCRIPTOR desc =
     {
-      emit_fatal(S("Failed to describe OpenGL pixel format"));
+      sizeof(PIXELFORMATDESCRIPTOR),
+      1,
+      PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
+      PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+      32,                   // Colordepth of the framebuffer.
+      0, 0, 0, 0, 0, 0,
+      0,
+      0,
+      0,
+      0, 0, 0, 0,
+      24,                   // Number of bits for the depthbuffer
+      8,                    // Number of bits for the stencilbuffer
+      0,                    // Number of Aux buffers in the framebuffer.
+      PFD_MAIN_PLANE,
+      0,
+      0,
+      0,
+      0
+    };
+    if(!DescribePixelFormat(g_os_window_win32.device_context, format, sizeof(desc), &desc))
+    {
+      emit_error(S("Failed to describe OpenGL pixel format"));
     }
+    
     if (!SetPixelFormat(g_os_window_win32.device_context, format, &desc))
     {
       emit_fatal(S("Cannot set OpenGL selected pixel format!"));
@@ -61,10 +76,11 @@ os_opengl_init()
       WGL_CONTEXT_MINOR_VERSION_ARB, 5,
       WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 
+#ifndef DEBUG
       // ask for debug context for non "Release" builds
       // this is so we can enable debug callback
       WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-
+#endif
       0,
     };
 
@@ -74,10 +90,10 @@ os_opengl_init()
       emit_fatal(S("Cannot create modern OpenGL context! OpenGL version 4.5 not supported?"));
     }
 
-    result = wglMakeCurrent(g_os_window_win32.device_context, g_os_window_win32.rendering_context);
-    win32_check_error();
-    if (!result)
+    b32 ok = wglMakeCurrent(g_os_window_win32.device_context, g_os_window_win32.rendering_context);
+    if (!ok)
     {
+      win32_check_error();
       emit_fatal(S("Failed to make current OpenGL context"));
     }
 
@@ -86,12 +102,10 @@ os_opengl_init()
       emit_fatal(S("Opengl failed to load functions"));
     }
 
-    glDebugMessageCallback(&_os_opengl_debug_callback, NULL);
+    glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(&_os_opengl_debug_callback, NULL);
   }
-
-  printf("OpenGL Version: %s\n", (const char*)glGetString(GL_VERSION));
-  printf("OpenGL Renderer: %s\n", (const char*)glGetString(GL_RENDERER));
 
   // Set viewport
   int width = g_os_window_win32.state.dimensions.x;
@@ -100,11 +114,12 @@ os_opengl_init()
 
   // Check for errors
   GLenum error = glGetError();
-  if (error != GL_NO_ERROR) {
+  if (error != GL_NO_ERROR)
+  {
     printf("OpenGL error after init: 0x%x\n", error);
   }
 
-  return result;
+  return true;
 }
 
 function void

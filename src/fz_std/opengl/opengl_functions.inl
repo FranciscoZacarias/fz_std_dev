@@ -6,6 +6,7 @@ GL_FUNC(void,   glProgramUniform2f,      (GLuint program, GLint location, GLfloa
 GL_FUNC(void,   glProgramUniform3f,      (GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2))
 GL_FUNC(void,   glProgramUniform4f,      (GLuint program, GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3))
 GL_FUNC(void,   glProgramUniformMatrix4fv, (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value))
+GL_FUNC(void,   glProgramUniformMatrix2fv, (GLuint program, GLint location, GLsizei count, GLboolean transpose, const GLfloat *value))
 
 GL_FUNC(GLuint, glCreateProgram,         (void))
 GL_FUNC(void,   glAttachShader,          (GLuint program, GLuint shader))
@@ -27,6 +28,8 @@ GL_FUNC(void,   glNamedBufferData,       (GLuint buffer, GLsizeiptr size, const 
 GL_FUNC(void,   glNamedBufferSubData,    (GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data))
 GL_FUNC(void,   glDeleteBuffers,         (GLsizei n, const GLuint *buffers))
 GL_FUNC(void,   glBindBuffer,            (GLenum target, GLuint buffer)) // still used in some cases
+GL_FUNC(void,   glNamedBufferStorage,    (GLuint buffer, GLsizeiptr size, const void *data, GLbitfield flags))
+
 
 // Vertex Arrays & Attributes (DSA)
 GL_FUNC(void,   glCreateVertexArrays,    (GLsizei n, GLuint *arrays))
@@ -58,6 +61,7 @@ GL_FUNC(void,   glDrawArrays,            (GLenum mode, GLint first, GLsizei coun
 GL_FUNC(void,   glDrawElements,          (GLenum mode, GLsizei count, GLenum type, const void *indices))
 GL_FUNC(void,   glDrawArraysInstanced,   (GLenum mode, GLint first, GLsizei count, GLsizei instancecount))
 GL_FUNC(void,   glDrawElementsInstanced, (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount))
+GL_FUNC(void,   glClearColor,            (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
 
 // Debug
 GL_FUNC(void,            glDebugMessageCallback, (GLDEBUGPROC callback, const void *userParam))
