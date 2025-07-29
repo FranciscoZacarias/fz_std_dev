@@ -3,7 +3,10 @@ os_opengl_init()
 {
   b32 result = true;
 
-  _win32_load_webgl_functions();
+  if (!_win32_load_wgl_functions())
+  {
+    emit_fatal(S("Failed to load wgl functions."));
+  }
 
   // set pixel format for OpenGL context
   {
@@ -32,18 +35,22 @@ os_opengl_init()
     UINT formats;
     if (!wglChoosePixelFormatARB(g_os_window_win32.device_context, attrib, NULL, 1, &format, &formats) || formats == 0)
     {
-      printf("OpenGL does not support required pixel format!");
-      return false;
+      emit_fatal(S("OpenGL does not support required pixel format!"));
     }
 
-    PIXELFORMATDESCRIPTOR desc = { .nSize = sizeof(desc) };
-    int ok = DescribePixelFormat(g_os_window_win32.device_context, format, sizeof(desc), &desc);
-    Assert(ok && "Failed to describe OpenGL pixel format");
-
+    PIXELFORMATDESCRIPTOR desc = {
+      sizeof(PIXELFORMATDESCRIPTOR), 1,
+      PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+      PFD_TYPE_RGBA, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 8, 0,
+      PFD_MAIN_PLANE, 0, 0, 0, 0
+    };
+    if (!DescribePixelFormat(g_os_window_win32.device_context, format, sizeof(desc), &desc))
+    {
+      emit_fatal(S("Failed to describe OpenGL pixel format"));
+    }
     if (!SetPixelFormat(g_os_window_win32.device_context, format, &desc))
     {
-      printf("Cannot set OpenGL selected pixel format!");
-      return false;
+      emit_fatal(S("Cannot set OpenGL selected pixel format!"));
     }
   }
 
@@ -51,7 +58,7 @@ os_opengl_init()
   {
     int attrib[] = {
       WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-      WGL_CONTEXT_MINOR_VERSION_ARB, 6,
+      WGL_CONTEXT_MINOR_VERSION_ARB, 5,
       WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 
       // ask for debug context for non "Release" builds
@@ -64,25 +71,37 @@ os_opengl_init()
     g_os_window_win32.rendering_context = wglCreateContextAttribsARB(g_os_window_win32.device_context, NULL, attrib);
     if (!g_os_window_win32.rendering_context)
     {
-      printf("Cannot create modern OpenGL context! OpenGL version 4.6 not supported?");
-      return false;
+      emit_fatal(S("Cannot create modern OpenGL context! OpenGL version 4.5 not supported?"));
     }
 
     result = wglMakeCurrent(g_os_window_win32.device_context, g_os_window_win32.rendering_context);
     win32_check_error();
-    Assert(result && "Failed to make current OpenGL context");
+    if (!result)
+    {
+      emit_fatal(S("Failed to make current OpenGL context"));
+    }
 
     if (!_os_opengl_load_functions())
     {
-      printf("Opengl failed to load functions");
-      return false;
+      emit_fatal(S("Opengl failed to load functions"));
     }
 
-    // enable debug callback
     glDebugMessageCallback(&_os_opengl_debug_callback, NULL);
-
-    Assert(glEnable && "glEnable not loaded");
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+  }
+
+  printf("OpenGL Version: %s\n", (const char*)glGetString(GL_VERSION));
+  printf("OpenGL Renderer: %s\n", (const char*)glGetString(GL_RENDERER));
+
+  // Set viewport
+  int width = g_os_window_win32.state.dimensions.x;
+  int height = g_os_window_win32.state.dimensions.y;
+  glViewport(0, 0, width, height);
+
+  // Check for errors
+  GLenum error = glGetError();
+  if (error != GL_NO_ERROR) {
+    printf("OpenGL error after init: 0x%x\n", error);
   }
 
   return result;
@@ -96,7 +115,7 @@ os_opengl_end()
 }
 
 function b32
-_win32_load_webgl_functions()
+_win32_load_wgl_functions()
 {
   // to get WGL functions we need valid GL context, so create dummy window for dummy GL context
   HWND dummy = CreateWindowExW(

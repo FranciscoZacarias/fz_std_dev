@@ -50,7 +50,7 @@ error_emit(Error_Level level, String8 message, String8 file, u32 line)
   error_entry_node->value.message   = string8_copy(g_error_context.arena, message);
   error_entry_node->value.file      = string8_copy(g_error_context.arena, file);
   error_entry_node->value.line      = line;
-  error_entry_node->value.timestamp = os_now_microseconds();
+  error_entry_node->value.timestamp = 0; // os_now_microseconds(); TODO(fz): fix later
 
   if (g_error_context.log_file_path.size > 0)
   {

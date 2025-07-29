@@ -60,5 +60,6 @@ GL_FUNC(void,   glDrawArraysInstanced,   (GLenum mode, GLint first, GLsizei coun
 GL_FUNC(void,   glDrawElementsInstanced, (GLenum mode, GLsizei count, GLenum type, const void *indices, GLsizei instancecount))
 
 // Debug
-GL_FUNC(void,   glDebugMessageCallback,  (GLDEBUGPROC callback, const void *userParam))
-GL_FUNC(void,   glEnable,                (GLenum cap)) // e.g., GL_DEBUG_OUTPUT
+GL_FUNC(void,            glDebugMessageCallback, (GLDEBUGPROC callback, const void *userParam))
+GL_FUNC(void,            glEnable,               (GLenum cap)) // e.g., GL_DEBUG_OUTPUT
+GL_FUNC(const GLubyte *, glGetString,            (GLenum name))

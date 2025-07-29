@@ -5,6 +5,7 @@
 
 ///////////////////////////////////////////////////////
 // @Section: Define Opengl function pointers
+typedef const GLubyte* (*PFNglGetStringPROC)(GLenum name);
 typedef void (*GLDEBUGPROC)(GLenum source, GLenum type, GLuint id, GLenum severity,GLsizei length, const GLchar *message, const void *userParam);
 #define GL_FUNC(ret,name,params) typedef ret (* PFN##name##PROC) params;
 # include "opengl_functions.inl"

@@ -45,9 +45,9 @@ global Error_Context g_error_context = {0};
 function void error_init(String8 error_log_path);
 function void error_emit(Error_Level level, String8 message, String8 file, u32 line);
 
-#define emit_info(str8_msgg)  error_emit(Error_Level_Info,   str8_msg, S(__FILE__), __LINE__)
-#define emit_warn(str8_msgg)  error_emit(Error_Level_Warning,str8_msg, S(__FILE__), __LINE__)
-#define emit_error(str8_msgg) error_emit(Error_Level_Error,  str8_msg, S(__FILE__), __LINE__)
-#define emit_fatal(str8_msgg) error_emit(Error_Level_Fatal,  str8_msg, S(__FILE__), __LINE__)
+#define emit_info(str8_msg)  error_emit(Error_Level_Info,   str8_msg, S(__FILE__), __LINE__)
+#define emit_warn(str8_msg)  error_emit(Error_Level_Warning,str8_msg, S(__FILE__), __LINE__)
+#define emit_error(str8_msg) error_emit(Error_Level_Error,  str8_msg, S(__FILE__), __LINE__)
+#define emit_fatal(str8_msg) error_emit(Error_Level_Fatal,  str8_msg, S(__FILE__), __LINE__)
 
 #endif // ERROR_H

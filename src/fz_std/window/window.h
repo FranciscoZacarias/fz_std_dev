@@ -17,7 +17,7 @@ global OS_Window g_os_window;
 function b32       os_window_init(s32 width, s32 height, String8 title); /* Creates a window */
 function void      os_window_open();                                     /* Shows a window */
 function void      os_window_close();                                    /* Closes and destroys a window */
-function b32       os_window_swap_buffers();                             /* Swaps buffers for the only existing window */
+function b32       os_is_application_running();                             /* Swaps buffers for the only existing window */
 function OS_Window os_window_get();                                      /* Returns the window handle */
 
 ///////////////////////////////////////////////////////
@@ -28,6 +28,7 @@ function b32  os_window_is_maximized();          /* True if maximized */
 function void os_window_set_maximized(b32 set);  /* Maximizes/restores window */
 function b32  os_window_is_minimized();          /* True if minimized */
 function void os_window_set_minimized(b32 set);  /* Minimizes/restores window */
+function void os_swap_buffers();                 /* Swaps buffers */
 
 ///////////////////////////////////////////////////////
 // @Section: Window Appearance

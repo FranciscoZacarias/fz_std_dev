@@ -295,7 +295,7 @@ os_window_close()
 }
 
 function b32
-os_window_swap_buffers()
+os_is_application_running()
 {
   b32 result = true;
 
@@ -311,13 +311,11 @@ os_window_swap_buffers()
       if (msg.message == WM_QUIT) 
       {
         _ApplicationReturn = (s32)msg.wParam;
-        result = false;
-        g_is_program_running = false;
+        return false;
       }
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
-    SwapBuffers(g_os_window_win32.device_context);
   }
   return result;
 }
@@ -402,6 +400,16 @@ os_window_set_minimized(b32 set)
   ShowWindow(g_os_window_win32.window_handle, set ? SW_MINIMIZE : SW_RESTORE);
 }
 
+function void
+os_swap_buffers()
+{
+  if (!SwapBuffers(g_os_window_win32.device_context))
+  {
+    win32_check_error();
+    emit_fatal(S("Failed to swap buffers."));
+  }
+}
+
 ///////////////////////////////////////////////////////
 // @Section: Window Appearance
 
@@ -471,6 +479,12 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message) 
   {
+    case WM_PAINT:
+    {
+      printf("wm_paint");
+    }
+    break;
+
     case WM_SETCURSOR:
     {
       if (LOWORD(lParam) == HTCLIENT) 
@@ -593,7 +607,8 @@ function HWND
 _win32_window_create(HINSTANCE hInstance, s32 width, s32 height, String8 title)
 {
   HWND result = {0};
-  WNDCLASSEXA wc = {
+  WNDCLASSEXA wc = 
+  {
     .cbSize        = sizeof(wc),
     .lpfnWndProc   = WndProc,
     .hInstance     = hInstance,
@@ -623,8 +638,5 @@ _win32_window_resize_callback(s32 width, s32 height)
   if (width == 0)  width  = 1;
   g_os_window_win32.state.dimensions.x = width;
   g_os_window_win32.state.dimensions.y = height;
-
-#if FZ_OPENGL
   glViewport(0, 0, width, height);
-#endif 
 }

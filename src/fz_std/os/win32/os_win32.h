@@ -3,7 +3,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4042) // Avoids known warning from winnls.h
-#define WIN32_LEAN_AND_MEAN 1
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #pragma warning(pop)
 

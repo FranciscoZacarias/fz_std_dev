@@ -2,6 +2,12 @@
 #define GL_FALSE 0
 #define GL_TRUE  1
 
+#define GL_VERSION    0x1F02
+#define GL_VENDOR     0x1F00
+#define GL_RENDERER   0x1F01
+#define GL_EXTENSIONS 0x1F03
+#define GL_VERSION    0x1F02
+
 typedef u32 GLenum;
 typedef f32 GLfloat;
 typedef u32 GLbitfield;
@@ -10,6 +16,7 @@ typedef s32 GLint;
 typedef s32 GLsizei;
 typedef char GLchar;
 typedef unsigned char GLboolean;
+typedef unsigned char GLubyte;
 
 #if ARCH_ADDRSIZE == 64
 typedef s64 GLsizeiptr;

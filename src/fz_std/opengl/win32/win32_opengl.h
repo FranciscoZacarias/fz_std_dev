@@ -17,6 +17,6 @@
 
 ///////////////////////////////////////////////////////
 // @Section: Functions
-function b32 _win32_load_webgl_functions(); /* Opens webgl functions */
+function b32 _win32_load_wgl_functions(); /* Opens webgl functions */
 
 #endif // WIN32_OPENGL_H

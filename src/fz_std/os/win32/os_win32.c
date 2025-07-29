@@ -188,14 +188,6 @@ os_console_init()
     // Already attached to a console; no need to allocate a new one.
     result = false;
   }
-  else if (AttachConsole(ATTACH_PARENT_PROCESS))
-  {
-    // Try attaching to parent process console.
-    FILE* fp;
-    freopen_s(&fp, "CONOUT$", "w", stdout);
-    freopen_s(&fp, "CONOUT$", "w", stderr);
-    result = true;
-  }
   else if (AllocConsole())
   {
     // No console attached; allocate a new one.
@@ -578,14 +570,7 @@ function void
 _win32_output_last_error(DWORD err)
 {
   LPWSTR messageBuffer = NULL;
-  FormatMessageW(
-    FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    err,
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-    (LPWSTR)&messageBuffer,
-    0,
-    NULL);
+  FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&messageBuffer, 0, NULL);
 
   if (messageBuffer)
   {
@@ -597,9 +582,9 @@ _win32_output_last_error(DWORD err)
       if (messageA)
       {
         WideCharToMultiByte(CP_ACP, 0, messageBuffer, -1, messageA, size_needed, NULL, NULL);
-        OutputDebugStringA(": ");
-        OutputDebugStringA(messageA);
-        OutputDebugStringA("\n");
+        printf(": ");
+        printf("%s\n", messageA);
+        printf("\n");
         HeapFree(GetProcessHeap(), 0, messageA);
       }
     }
