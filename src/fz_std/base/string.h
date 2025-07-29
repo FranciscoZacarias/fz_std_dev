@@ -45,7 +45,6 @@ function u8*      cstring_from_string8(Arena* arena, String8 str);
 function String8  string8_from_cstring(u8* cstring);
 function u32      cstring_length(u8* cstring);
 
-
 //~ Char Functions
 function b32 char8_is_alpha(u8 c);
 function b32 char8_is_alphanum(u8 c);

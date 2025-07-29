@@ -592,7 +592,8 @@ mat4f32_rotate_axis(Vec3F32 axis, f32 radians)
   f32 z = axis.z;
   f32 lengthSquared = x*x + y*y + z*z;
   
-  if ((lengthSquared != 1.0f) && (lengthSquared != 0.0f)) {
+  if ((lengthSquared != 1.0f) && (lengthSquared != 0.0f))
+  {
     f32 ilength = 1.0f/sqrtf(lengthSquared);
     x *= ilength;
     y *= ilength;

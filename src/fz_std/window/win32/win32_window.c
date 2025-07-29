@@ -306,9 +306,11 @@ os_window_swap_buffers()
   os_timer_start(&_Timer_FrameTime);
 
   MSG msg = {0};
-  if (g_os_window_win32.window_handle != NULL) {
+  if (g_os_window_win32.window_handle != NULL)
+  {
     _input_update();
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    {
       if (msg.message == WM_QUIT) 
       {
         _ApplicationReturn = (s32)msg.wParam;

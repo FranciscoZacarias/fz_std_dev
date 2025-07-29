@@ -16,25 +16,29 @@ string8_from_wchar(Arena* arena, wchar_t* wstr)
 {
   String8 result = {0};
   
-  if (!wstr) {
+  if (!wstr)
+  {
     return result;
   }
   
   // Get required buffer size for UTF-8
   int required_size = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
-  if (required_size <= 0) {
+  if (required_size <= 0)
+  {
     return result;
   }
   
   // Allocate from arena (subtract 1 to exclude NULL terminator from size)
   u8* buffer = array_push(arena, u8, required_size);
-  if (!buffer) {
+  if (!buffer)
+  {
     return result;
   }
   
   // Convert to UTF-8
   int converted = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, (u8*)buffer, required_size, NULL, NULL);
-  if (converted <= 0) {
+  if (converted <= 0)
+  {
     return result;
   }
   
