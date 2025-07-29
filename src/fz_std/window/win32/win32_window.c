@@ -256,7 +256,7 @@ os_window_init(s32 width, s32 height, String8 title)
 
   HWND window = _win32_window_create(_hInstance, 600, 600);
   win32_check_error();
-  if (!window)
+  if (!IsWindow(window))
   {
     printf("Failed to get window handle\n");
     return false;
@@ -265,20 +265,17 @@ os_window_init(s32 width, s32 height, String8 title)
   HDC device_context = GetDC(window);
   win32_check_error();
 
-  if (result)
-  {
-    g_os_window_win32 = (OS_Window_Win32) {
-      .window_handle  = window,
-      .device_context = device_context,
-      .state = {
-        .dimensions = {200, 200},
-        .title      = S("FZ_Window_Title"),
-      },
-    };
+  g_os_window_win32 = (OS_Window_Win32) {
+    .window_handle  = window,
+    .device_context = device_context,
+    .state = {
+      .dimensions = {200, 200},
+      .title      = S("FZ_Window_Title"),
+    },
+  };
 
-    _input_init();
-    os_resize_callback = _win32_window_resize_callback;
-  }
+  _input_init();
+  os_resize_callback = _win32_window_resize_callback;
 
   return result;
 }
