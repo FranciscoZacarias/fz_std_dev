@@ -27,7 +27,7 @@
 # endif
 #endif
 
-#if ENABLE_ASSERT
+#if DEBUG
 # define Assert(condition) Statement( if (!(condition)){ AssertBreak(condition); } )
 # define AssertNoReentry() Statement(local_persist b32 triggered = 0;Assert(triggered == 0); triggered = 1;) 
 #else

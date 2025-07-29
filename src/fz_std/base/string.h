@@ -21,6 +21,7 @@ typedef struct String8_List {
 } String8_List;
 
 function String8 string8_new(u64 size, u8* str);
+function String8 string8_copy(Arena* arena, String8 source);
 function String8 string8_range(u8* first, u8* range);
 function String8 string8_concat(Arena* arena, String8 a, String8 b); // TODO(fz): Test this func
 function String8 string8_slice(String8 str, u64 start, u64 end);
@@ -30,6 +31,7 @@ function b32     string8_find_first(String8 str, String8 substring, u64* index);
 function b32     string8_find_last(String8 str, String8 substring, u64* index); 
 function b32     string8_match(String8 a, String8 b, b32 case_sensitive);
 function void    string8_printf(String8 str);
+function String8 string8_from_format(Arena* arena, char const* fmt, ...);
 
 function String8_List string8_split(Arena* arena, String8 str, String8 split_character);
 function String8_List string8_list_new(Arena* arena, String8 str);

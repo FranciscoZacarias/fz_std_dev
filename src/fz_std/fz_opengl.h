@@ -1,6 +1,12 @@
 #ifndef FZ_OPENGL_H
 #define FZ_OPENGL_H
 
+/*
+NOTE(fz):
+  - Right now we assume that once the graphics API was included, 
+    it's the only one to be used for the program's lifetime.
+*/
+
 #ifndef FZ_WINDOW
 # error fz_opengl.h requires including fz_window.h
 #endif

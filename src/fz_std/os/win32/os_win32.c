@@ -29,7 +29,7 @@ string8_from_wchar(Arena* arena, wchar_t* wstr)
   }
   
   // Allocate from arena (subtract 1 to exclude NULL terminator from size)
-  u8* buffer = array_push(arena, u8, required_size);
+  u8* buffer = push_array(arena, u8, required_size);
   if (!buffer)
   {
     return result;
@@ -118,8 +118,8 @@ function void
 os_timer_init()
 {
   QueryPerformanceFrequency(&win32_performance_frequency);
-  os_timer_start(&_Timer_ElapsedTime);
-  os_timer_start(&_Timer_FrameTime);
+  os_timer_start(&g_timer_elapsed_time);
+  os_timer_start(&g_timer_frame_time);
 }
 
 function void
@@ -147,7 +147,7 @@ os_get_elapsed_time()
 {
   LARGE_INTEGER current;
   QueryPerformanceCounter(&current);
-  u64 delta = (u64)current.QuadPart - _Timer_ElapsedTime.start_ticks;
+  u64 delta = (u64)current.QuadPart - g_timer_elapsed_time.start_ticks;
   return (f32)((f64)delta / (f64)win32_performance_frequency.QuadPart);
 }
 
@@ -156,8 +156,24 @@ os_get_frame_time()
 {
   LARGE_INTEGER current;
   QueryPerformanceCounter(&current);
-  u64 delta = (u64)current.QuadPart - _Timer_FrameTime.start_ticks;
+  u64 delta = (u64)current.QuadPart - g_timer_frame_time.start_ticks;
   return (f32)((f64)delta / (f64)win32_performance_frequency.QuadPart);
+}
+
+function u64
+os_now_microseconds(void)
+{
+  LARGE_INTEGER counter;
+  QueryPerformanceCounter(&counter);
+
+  u64 result = (counter.QuadPart * 1000000ULL) / win32_performance_frequency.QuadPart;
+  return result;
+}
+
+function u64
+os_now_milliseconds()
+{
+  return os_now_microseconds() / (u64)1000;
 }
 
 ///////////////////////////////////////////////////////
@@ -355,7 +371,7 @@ os_file_load(Arena* arena, String8 path)
   }
 
   DWORD file_size = GetFileSize(file, 0);
-  u8 *buffer = array_push(arena, u8, file_size);
+  u8 *buffer = push_array(arena, u8, file_size);
   DWORD read = 0;
   if(ReadFile(file, buffer, file_size, &read, 0) && read == file_size)
   {
@@ -446,7 +462,7 @@ os_directory_pop(String8 path)
       break;
     }
   }
-  return result;;
+  return result;
 }
 
 function String8  
@@ -472,6 +488,55 @@ os_directory_push(String8 path, String8 directory)
 
   scratch_end(&scratch);
   return result;
+}
+
+///////////////////////////////////////////////////////
+// @Section: Misc
+function String8
+os_executable_path(Arena* arena)
+{
+  String8 result = {0};
+
+  u8 temp_path[MAX_PATH];
+  DWORD length = GetModuleFileNameA(NULL, (char*)temp_path, MAX_PATH);
+
+  if (length > 0 && length < MAX_PATH)
+  {
+    result.size = (u64)length;
+    result.str = push_array(arena, u8, result.size);
+    MemoryCopy(result.str, temp_path, result.size);
+  }
+
+  return result;
+}
+
+function String8
+os_get_appdata_dir(Arena* arena, String8 project_name)
+{
+  String8 result = {0};
+
+  DWORD len = GetEnvironmentVariableA("APPDATA", 0, 0);
+  if (len == 0) return result;
+
+  u8* temp = push_array(arena, u8, len + 1);
+  GetEnvironmentVariableA("APPDATA", (LPSTR)temp, len + 1);
+  String8 appdata = string8_from_cstring(temp);
+
+  // Build full path: %APPDATA%\project_name
+  String8 full_path = string8_from_format(arena, "%S\\%S", appdata, project_name);
+
+  // Create the directory if it doesn't exist
+  os_directory_create(full_path);
+
+  result = full_path;
+  return result;
+}
+
+
+function void
+os_exit_process(u32 code)
+{
+  ExitProcess(code);
 }
 
 ///////////////////////////////////////////////////////
@@ -505,7 +570,8 @@ function LONG WINAPI
 win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs)
 {
   // TODO(fz): Implement
-  ExitProcess(1);
+  os_exit_process(1);
+  return 1;
 }
 
 function void

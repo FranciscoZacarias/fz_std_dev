@@ -15,7 +15,7 @@ Additional modules
   #include "fz_opengl.h"
 
 Macros:
-  - ENABLE_ASSERT 
+  - DEBUG
   - OS_WINDOWS, OS_LINUX, OS_MAC
   - COMPILER_CLANG, COMPILER_GCC, COMPILER_MSVC, COMPILER_MSVC_YEAR, 
   - ARCH_X64, ARCH_X86, ARCH_ARM64, ARCH_ARM32, ARCH_ADDRSIZE, ARCH_LITTLE_ENDIAN
@@ -40,6 +40,7 @@ Macros:
 #include "base\command_line.h"
 #include "base\entry_point.h"
 #include "os\os.h"
+#include "base\error.h"
 
 ///////////////////////////////////////////////////////
 // @Section: *.c
@@ -50,5 +51,6 @@ Macros:
 #include "base\command_line.c"
 #include "base\entry_point.c"
 #include "os\os.c"
+#include "base\error.c"
 
 #endif // BASE_H

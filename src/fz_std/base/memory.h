@@ -29,8 +29,8 @@ function void   arena_free(Arena* arena);
 
 function void print_arena(Arena *arena, const u8* label);
 
-#define array_push(arena, type, count)         (type*)_arena_push((arena), sizeof(type)*(count))
-#define array_push_no_zero(arena, type, count) (type*)_arena_push_no_zero((arena), sizeof(type)*(count))
+#define push_array(arena, type, count)         (type*)_arena_push((arena), sizeof(type)*(count))
+#define push_array_no_zero(arena, type, count) (type*)_arena_push_no_zero((arena), sizeof(type)*(count))
 
 typedef struct Scratch {
   Arena* arena;

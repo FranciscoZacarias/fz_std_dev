@@ -70,11 +70,14 @@ typedef struct PerformanceTimer
   f32 elapsed_seconds;
 } Performance_Timer;
 
-function void os_timer_init();                               /* Initializes performance timing */
-function void os_timer_start(Performance_Timer* timer);      /* Starts the given timer */
-function void os_timer_end(Performance_Timer* timer);        /* Stops the timer and calculates elapsed time */
-function f32  os_get_elapsed_time();                         /* Returns time elapsed since program started */
-function f32  os_get_frame_time();                           /* Returns time elapsed since last frame */
+function void os_timer_init();                          /* Initializes performance timing */
+function void os_timer_start(Performance_Timer* timer); /* Starts the given timer */
+function void os_timer_end(Performance_Timer* timer);   /* Stops the timer and calculates elapsed time */
+function f32  os_get_elapsed_time();                    /* Returns time elapsed since program started */
+function f32  os_get_frame_time();                      /* Returns time elapsed since last frame */
+
+function u64  os_now_microseconds();                    /* High-resolution time */
+function u64  os_now_milliseconds();                    /* Time in milliseconds */
 
 ///////////////////////////////////////////////////////
 // @Section: Console
@@ -347,6 +350,12 @@ function void _input_process_mouse_button(Mouse_Button button, b32 is_pressed); 
 function void _input_process_mouse_cursor(s32 x, s32 y);                        /* Internal: Updates current mouse cursor position in screen space */
 
 ///////////////////////////////////////////////////////
+// @Section: Misc
+function String8 os_executable_path(Arena* arena);
+function String8 os_get_appdata_dir(Arena* arena, String8 project_name);
+function void    os_exit_process(u32 code);
+
+///////////////////////////////////////////////////////
 // @Section: OS Global State
 typedef struct OS_State
 {
@@ -355,7 +364,7 @@ typedef struct OS_State
   u64 microsecond_resolution;
 } OS_State;
 
-global OS_State OSState = {0};
+global OS_State g_os_state = {0};
 
 ///////////////////////////////////////////////////////
 // @Section: Entry point
@@ -366,8 +375,8 @@ function void entry_point(Command_Line* command_line); /* Application entry poin
 
 global b32 g_is_program_running = true;
 
-global Performance_Timer _Timer_FrameTime   = {0};
-global Performance_Timer _Timer_ElapsedTime = {0};
+global Performance_Timer g_timer_frame_time   = {0};
+global Performance_Timer g_timer_elapsed_time = {0};
 
 ///////////////////////////////////////////////////////
 // @Section: Window

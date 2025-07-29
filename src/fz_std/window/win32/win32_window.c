@@ -302,8 +302,8 @@ os_window_swap_buffers()
 {
   b32 result = true;
 
-  os_timer_end(&_Timer_FrameTime);
-  os_timer_start(&_Timer_FrameTime);
+  os_timer_end(&g_timer_frame_time);
+  os_timer_start(&g_timer_frame_time);
 
   MSG msg = {0};
   if (g_os_window_win32.window_handle != NULL)
@@ -421,6 +421,7 @@ os_window_set_title(String8 title)
   char* ctitle = cstring_from_string8(scratch.arena, title);
   b32 result = SetWindowTextA(g_os_window_win32.window_handle, ctitle);
   win32_check_error();
+  // TODO(fz): Add title to g_os_window
   scratch_end(&scratch);
   return result;
 }

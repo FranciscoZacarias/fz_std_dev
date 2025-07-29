@@ -6,6 +6,16 @@ string8_new(u64 size, u8* str)
 }
 
 function String8
+string8_copy(Arena* arena, String8 source)
+{
+  String8 result;
+  result.size = source.size;
+  result.str  = push_array(arena, u8, result.size);
+  MemoryCopy(result.str, source.str, result.size);
+  return result;
+}
+
+function String8
 string8_range(u8* first, u8* range)
 {
   String8 result = (String8){(u64)(range - first), first};
@@ -17,7 +27,7 @@ string8_concat(Arena* arena, String8 a, String8 b)
 {
   String8 result = { 0 };
   result.size = a.size + b.size;
-  result.str = array_push(arena, u8, result.size);
+  result.str = push_array(arena, u8, result.size);
   MemoryCopy(result.str, a.str, a.size);
   MemoryCopy(result.str + a.size, b.str, b.size);
   return result;
@@ -57,7 +67,8 @@ string8_slice(String8 str, u64 start, u64 end)
   if (start > str.size) start = str.size;
   if (end > str.size)   end   = str.size;
   if (start > end)      start = end;
-  return (String8){ .size = end - start, .str  = str.str + start };
+  String8 result = (String8){ .size = end - start, .str  = str.str + start };
+  return result;
 }
 
 function b32
@@ -82,6 +93,31 @@ function void
 string8_printf(String8 str)
 {
   printf("%.*s", (s32)str.size, str.str);
+}
+
+function String8
+string8_from_format(Arena* arena, char const* fmt, ...)
+{
+  String8 result = {0};
+
+  va_list args;
+  va_start(args, fmt);
+
+  // Try to format into a fixed buffer first
+  char temp[8192];
+  int len = vsnprintf(temp, sizeof(temp), fmt, args);
+  va_end(args);
+
+  if (len <= 0)
+  {
+    return result;
+  }
+
+  result.size = (u64)len;
+  result.str = push_array(arena, u8, result.size);
+  MemoryCopy(result.str, (u8*)temp, result.size);
+
+  return result;
 }
 
 function String8_List
@@ -114,7 +150,7 @@ function String8_List
 string8_list_new(Arena* arena, String8 str)
 {
   String8_List result = {0};
-  String8_Node* node = array_push(arena, String8_Node, 1);
+  String8_Node* node = push_array(arena, String8_Node, 1);
   result.first = node;
   result.last  = node;
   result.node_count = 1;
@@ -156,7 +192,7 @@ string8_list_pop(String8_List* list)
 function void
 string8_list_push(Arena* arena, String8_List* list, String8 str)
 {
-  String8_Node* node = array_push(arena, String8_Node, sizeof(String8_Node));
+  String8_Node* node = push_array(arena, String8_Node, sizeof(String8_Node));
   node->value = str;
   if (!list->first && !list->last)
   {
@@ -175,7 +211,7 @@ string8_list_push(Arena* arena, String8_List* list, String8 str)
 function String8
 string8_list_join(Arena* arena, String8_List* list)
 {
-  u8* dst = array_push(arena, u8, list->total_size);
+  u8* dst = push_array(arena, u8, list->total_size);
   u8* ptr = dst;
   for (String8_Node* node = list->first; node; node = node->next)
   {
@@ -259,7 +295,7 @@ s32_from_string8(String8 str, s32* value)
 function u8*
 cstring_from_string8(Arena* arena, String8 str)
 {
-  u8* result = array_push(arena, u8, str.size + 1);
+  u8* result = push_array(arena, u8, str.size + 1);
   MemoryCopy(result, str.str, str.size);
   result[str.size] = 0;
   return result;

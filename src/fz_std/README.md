@@ -4,7 +4,7 @@
 Basic structure:
 
 ```c
-#define ENABLE_ASSERT 1
+#define DEBUG 1
 #include "fz_base.h" // Required
 #include "fz_window.h" // Launches window (requires base)
 #include "fz_opengl.h" // Attaches opengl context to window (requires window)
@@ -15,7 +15,7 @@ entry_point(Command_Line* command_line)
   Arena* arena = arena_alloc();
 
   os_console_init(); // Available with fz_base.h
-  os_window_init(400, 400, S("asd")); // Available with fz_window.h
+  os_window_init(400, 400, S("My Window")); // Available with fz_window.h
   os_window_open(); // Available with fz_window.h
   os_opengl_init(); // Available with fz_opengl.h
 
