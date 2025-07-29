@@ -6,8 +6,10 @@
 #endif
 #define FZ_OPENGL 1
 
+
 #include "opengl\opengl.h"
 #if OS_WINDOWS
+# pragma comment(lib, "opengl32.lib")
 # include "opengl\win32\win32_opengl.h"
 #elif OS_LINUX
 # error fz_opengl for linux os not implemented

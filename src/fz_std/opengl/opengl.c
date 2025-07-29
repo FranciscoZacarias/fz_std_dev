@@ -58,17 +58,41 @@ _os_opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity
   }
 }
 
+function void*
+_load_gl_function(const char *name)
+{
+  void *proc = (void *)wglGetProcAddress(name);
+
+  // Check for invalid pointer values
+  if (!proc || proc == (void *)0x1 || proc == (void *)0x2 || proc == (void *)0x3 || proc == (void *)-1)
+  {
+    local_persist HMODULE opengl32_module = NULL;
+    if (!opengl32_module)
+    {
+      opengl32_module = GetModuleHandleA("opengl32.dll");
+      if (!opengl32_module)
+      {
+        printf("opengl32.dll not loaded. Trying to load it dynamically.");
+        opengl32_module = LoadLibraryA("opengl32.dll");
+        if (opengl32_module)
+        {
+          printf("Unable to load opengl32.dll");
+          return NULL;
+        }
+      }
+    }
+    proc = (void *)GetProcAddress(opengl32_module, name);
+  }
+  return proc;
+}
+
 function b32
 _os_opengl_load_functions()
 {
-  //glUseProgram = (PFNglUseProgramPROC)wglGetProcAddress("glUseProgram");
-  //glDebugMessageCallback = (PFNglDebugMessageCallbackPROC)wglGetProcAddress("glDebugMessageCallback");
-
    #define GL_FUNC(ret, name, params) \
-     name = (PFN##name##PROC)wglGetProcAddress(#name); \
+     name = (PFN##name##PROC)_load_gl_function(#name); \
      if (!name) return false;
    # include "opengl_functions.inl"
    #undef GL_FUNC
-  
   return true;
 }
