@@ -10,7 +10,7 @@ entry_point(Command_Line* command_line)
   Arena* arena = arena_alloc();
 
   os_console_init();
-  os_window_init(400, 400, S("asd"));
+  os_window_init(400, 400, S("fz_std_tests"));
   os_window_open();
   os_opengl_init();
 

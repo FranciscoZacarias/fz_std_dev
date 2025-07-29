@@ -254,7 +254,7 @@ os_window_init(s32 width, s32 height, String8 title)
 {
   b32 result = true;
 
-  HWND window = _win32_window_create(_hInstance, 600, 600);
+  HWND window = _win32_window_create(_hInstance, width, height, title);
   win32_check_error();
   if (!IsWindow(window))
   {
@@ -269,7 +269,7 @@ os_window_init(s32 width, s32 height, String8 title)
     .window_handle  = window,
     .device_context = device_context,
     .state = {
-      .dimensions = {200, 200},
+      .dimensions = {width, height},
       .title      = S("FZ_Window_Title"),
     },
   };
@@ -590,7 +590,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 function HWND
-_win32_window_create(HINSTANCE hInstance, s32 width, s32 height)
+_win32_window_create(HINSTANCE hInstance, s32 width, s32 height, String8 title)
 {
   HWND result = {0};
   WNDCLASSEXA wc = {
@@ -607,9 +607,12 @@ _win32_window_create(HINSTANCE hInstance, s32 width, s32 height)
     
   DWORD exstyle = WS_EX_APPWINDOW;
   DWORD style   = WS_OVERLAPPEDWINDOW;
-  result = CreateWindowExA(exstyle, wc.lpszClassName, "FZ_Window_Title", style, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
+
+  Scratch scratch = scratch_begin(0, 0);
+  result = CreateWindowExA(exstyle, wc.lpszClassName, cstring_from_string8(scratch.arena, title), style, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, wc.hInstance, NULL);
   win32_check_error();
 
+  scratch_end(&scratch);
   return result;
 }
 
