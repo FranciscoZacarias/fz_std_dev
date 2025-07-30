@@ -20,6 +20,17 @@ function void _win32_output_last_error(DWORD error);
 #define win32_check_error() Statement(DWORD e = GetLastError(); if (e != 0) { _win32_output_last_error(e); })
 
 ///////////////////////////////////////////////////////
+// @Section: Timer
+typedef struct OS_Win32_Timer OS_Win32_Timer;
+struct OS_Win32_Timer
+{
+  LARGE_INTEGER frequency;
+  LARGE_INTEGER start_counter;
+};
+
+global LARGE_INTEGER g_win32_performance_frequency;
+
+///////////////////////////////////////////////////////
 // @Section: Modern Windows SDK functions
 // rfj: We must dynamically link to them, since they can be missing in older SDKs
 typedef HRESULT W32_SetThreadDescription_Type(HANDLE hThread, PCWSTR lpThreadDescription);

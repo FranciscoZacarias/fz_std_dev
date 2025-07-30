@@ -2,6 +2,7 @@ function void
 main_thread_base_entry_point(int argc, char **argv)
 {
   Scratch scratch = scratch_begin(0, 0);
+  os_time_init();
 
   // Setup log system
   {

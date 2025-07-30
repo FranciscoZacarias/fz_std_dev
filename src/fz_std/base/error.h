@@ -17,9 +17,9 @@ struct Log_Entry
   Log_Level level;
   String8 message;
 
-  String8 file;
-  u32     line;
-  u64     timestamp;
+  String8     file;
+  u32         line;
+  OS_Date_Time timestamp;
 };
 
 #define MAX_ERROR_NODES 128

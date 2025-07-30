@@ -51,7 +51,7 @@ log_emit(Log_Level level, String8 message, String8 file, u32 line)
   log_entry_node->value.message   = string8_copy(g_log_context.arena, message);
   log_entry_node->value.file      = string8_copy(g_log_context.arena, file);
   log_entry_node->value.line      = line;
-  log_entry_node->value.timestamp = 0; // os_now_microseconds(); TODO(fz): fix later
+  log_entry_node->value.timestamp = os_datetime_now();
 
   if (g_log_context.log_file_path.size > 0)
   {
@@ -65,8 +65,10 @@ log_emit(Log_Level level, String8 message, String8 file, u32 line)
       default:                level_str = S("UNKNOWN"); break;
     }
     
-    String8 datetime = S("00-00-0000 00:00:00"); // TODO(fz): Replace with actual date time
-    String8 log_line = string8_from_format(g_log_context.arena, "%s :: %.*s :: %.*s:%u:\n%.*s\n", level_str.str, (s32)datetime.size, datetime.str, (s32)file.size, file.str, line, (s32)message.size, message.str);
+    OS_Date_Time date = log_entry_node->value.timestamp;
+    String8 log_line = string8_from_format(g_log_context.arena, 
+      "%s :: %02d-%02d-%02d %02d:%02d:%02d :: %.*s:%u:\n%.*s\n", 
+      level_str.str, date.year, date.month, date.day, date.hour, date.minute, date.second, (s32)file.size, file.str, line, (s32)message.size, message.str);
     os_file_append(g_log_context.log_file_path, log_line.str, log_line.size);
     os_console_write(log_line);
   }

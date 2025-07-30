@@ -498,3 +498,79 @@ _win32_output_last_error(DWORD err)
     LocalFree(messageBuffer);
   }
 }
+
+///////////////////////////////////////////////////////
+// @Section: Timer
+
+function void
+os_time_init()
+{
+  QueryPerformanceFrequency(&g_win32_performance_frequency);
+}
+
+function OS_Time
+os_time_now_microseconds()
+{
+  LARGE_INTEGER counter;
+  QueryPerformanceCounter(&counter);
+
+  OS_Time result = {0};
+  result.microseconds = (counter.QuadPart * 1000000ULL) / g_win32_performance_frequency.QuadPart;
+  return result;
+}
+
+function u64
+os_get_epoch_microseconds()
+{
+  FILETIME ft;
+  GetSystemTimeAsFileTime(&ft);
+
+  ULARGE_INTEGER uli;
+  uli.LowPart  = ft.dwLowDateTime;
+  uli.HighPart = ft.dwHighDateTime;
+
+  // Convert from 100-nanosecond intervals since 1601 to microseconds since 1970
+  return (uli.QuadPart - 116444736000000000ULL) / 10;
+}
+
+function OS_Date_Time
+os_datetime_now()
+{
+  SYSTEMTIME st;
+  GetLocalTime(&st);
+  
+  OS_Date_Time result = {0};
+  result.year        = st.wYear;
+  result.month       = (u8)st.wMonth;
+  result.day         = (u8)st.wDay;
+  result.hour        = (u8)st.wHour;
+  result.minute      = (u8)st.wMinute;
+  result.second      = (u8)st.wSecond;
+  result.millisecond = st.wMilliseconds;
+  return result;
+}
+
+function OS_Timer
+os_timer_start()
+{
+  OS_Timer timer = {0};
+  OS_Win32_Timer *win32_timer = (OS_Win32_Timer *)timer.opaque;
+  
+  QueryPerformanceFrequency(&win32_timer->frequency);
+  QueryPerformanceCounter(&win32_timer->start_counter);
+  return timer;
+}
+
+function OS_Time
+os_timer_elapsed(OS_Timer *timer)
+{
+  OS_Win32_Timer *win32_timer = (OS_Win32_Timer *)timer->opaque;
+  LARGE_INTEGER current_counter;
+  QueryPerformanceCounter(&current_counter);
+  
+  OS_Time result = {0};
+  LARGE_INTEGER elapsed = {current_counter.QuadPart - win32_timer->start_counter.QuadPart};
+  result.microseconds   = (elapsed.QuadPart * 1000000) / win32_timer->frequency.QuadPart;
+  return result;
+}
+

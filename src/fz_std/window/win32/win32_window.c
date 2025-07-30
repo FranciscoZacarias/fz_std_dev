@@ -301,6 +301,10 @@ os_is_application_running()
   if (g_os_window_win32.window_handle != NULL)
   {
     _input_update();
+
+    _update_frame_info();
+    f32 fps = os_get_fps();
+
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
       if (msg.message == WM_QUIT) 

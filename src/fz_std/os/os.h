@@ -347,6 +347,58 @@ function void _input_process_mouse_cursor(s32 x, s32 y);                        
 function String8 os_executable_path(Arena* arena);
 function String8 os_get_appdata_dir(Arena* arena, String8 project_name);
 function void    os_exit_process(u32 code);
+function f32     os_get_fps(); /* Returns current fps */
+
+///////////////////////////////////////////////////////
+// @Section: Timer
+
+typedef struct OS_Timer OS_Timer;
+struct OS_Timer
+{
+  u64 opaque[2];
+};
+
+typedef struct OS_Time OS_Time;
+struct OS_Time
+{
+  u64 microseconds;
+};
+
+typedef struct OS_Date_Time OS_Date_Time;
+struct OS_Date_Time
+{
+  u16 year;
+  u8  month, day, hour, minute, second;
+  u16 millisecond;
+};
+
+function void         os_time_init();                          /* Initializes timer module */
+function OS_Time      os_time_now_microseconds();              /* Returns time since boot is microseconds */
+function u64          os_get_epoch_microseconds();             /* Returns wall clock time since unix epoch (1970-01-01) */
+function OS_Date_Time os_datetime_now();                       /*  */
+function f64          os_time_in_seconds(OS_Time time);        /*  */
+function f64          os_time_in_milliseconds(OS_Time time);   /*  */
+function u64          os_time_in_microseconds(OS_Time time);   /*  */
+function OS_Time      os_time_diff(OS_Time start, OS_Time end);/*  */
+
+function OS_Timer os_timer_start();                  /* Returns a started timer */
+function OS_Time  os_timer_elapsed(OS_Timer *timer); /* Returns a started timer's elapsed time */
+function void     os_timer_reset(OS_Timer *timer);   /* Resets a timer */
+
+///////////////////////////////////////////////////////
+// @Section: Frame Info
+typedef struct OS_Frame_Info OS_Frame_Info;
+struct OS_Frame_Info
+{
+  OS_Time frame_start; /* absolute time at the start of this frame */
+  OS_Time frame_time;  /* delta between current and previous frame start */
+  u64     frame_count; /* how many frames have passed */
+};
+
+global OS_Frame_Info g_os_frame_info_previous = {0};
+global OS_Frame_Info g_os_frame_info_current  = {0};
+
+function void _update_frame_info(); /* Updates both g_os_frame_info_previous and g_os_frame_info_current */
 
 ///////////////////////////////////////////////////////
 // @Section: OS Global State
