@@ -4,6 +4,15 @@
 #include "fz_opengl.h"
 
 function void
+input_update()
+{
+  if (input_is_key_pressed(Keyboard_Key_ESCAPE))
+  {
+    os_exit_process(0);
+  }
+}
+
+function void
 entry_point(Command_Line* command_line)
 {
   Arena* arena = arena_alloc();
@@ -20,6 +29,8 @@ entry_point(Command_Line* command_line)
   os_window_enable_vsync(true);
   while(os_is_application_running())
   {
+    input_update();
+
     phase += speed;
     if (phase > tau) phase -= tau;
     float t = (1.0f + cosf(phase)) * 0.5f;
