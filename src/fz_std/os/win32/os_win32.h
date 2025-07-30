@@ -15,13 +15,6 @@ function void _win32_output_last_error(DWORD error);
 
 ///////////////////////////////////////////////////////
 // @Section: Timer
-typedef struct OS_Win32_Timer OS_Win32_Timer;
-struct OS_Win32_Timer
-{
-  LARGE_INTEGER frequency;
-  LARGE_INTEGER start_counter;
-};
-
 global LARGE_INTEGER g_win32_performance_frequency;
 
 ///////////////////////////////////////////////////////

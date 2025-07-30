@@ -508,15 +508,28 @@ os_time_init()
   QueryPerformanceFrequency(&g_win32_performance_frequency);
 }
 
-function OS_Time
-os_time_now_microseconds()
+function u64
+os_time_microseconds()
 {
   LARGE_INTEGER counter;
   QueryPerformanceCounter(&counter);
+  return (counter.QuadPart * 1000000) / g_win32_performance_frequency.QuadPart;
+}
 
-  OS_Time result = {0};
-  result.microseconds = (counter.QuadPart * 1000000ULL) / g_win32_performance_frequency.QuadPart;
-  return result;
+function u64
+os_time_milliseconds()
+{
+  LARGE_INTEGER counter;
+  QueryPerformanceCounter(&counter);
+  return (counter.QuadPart * 1000) / g_win32_performance_frequency.QuadPart;
+}
+
+function f64
+os_time_seconds()
+{
+  LARGE_INTEGER counter;
+  QueryPerformanceCounter(&counter);
+  return (f64)counter.QuadPart / (f64)g_win32_performance_frequency.QuadPart;
 }
 
 function u64
@@ -524,12 +537,7 @@ os_get_epoch_microseconds()
 {
   FILETIME ft;
   GetSystemTimeAsFileTime(&ft);
-
-  ULARGE_INTEGER uli;
-  uli.LowPart  = ft.dwLowDateTime;
-  uli.HighPart = ft.dwHighDateTime;
-
-  // Convert from 100-nanosecond intervals since 1601 to microseconds since 1970
+  ULARGE_INTEGER uli = {ft.dwLowDateTime, ft.dwHighDateTime};
   return (uli.QuadPart - 116444736000000000ULL) / 10;
 }
 
@@ -538,39 +546,68 @@ os_datetime_now()
 {
   SYSTEMTIME st;
   GetLocalTime(&st);
+  OS_Date_Time result =
+  {
+    st.wYear, st.wMonth, st.wDay,
+    st.wHour, st.wMinute, st.wSecond,
+    st.wMilliseconds
+  };
+  return result;
+}
+
+function String8
+os_datetime_to_string8(Arena *arena, OS_Date_Time dt)
+{
+  local_persist u8* months[] = 
+  {
+    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+  };
+ 
+  String8 month_name = (dt.month >= 1 && dt.month <= 12) ? string8_from_cstring(months[dt.month - 1]) : S("Invalid");
   
-  OS_Date_Time result = {0};
-  result.year        = st.wYear;
-  result.month       = (u8)st.wMonth;
-  result.day         = (u8)st.wDay;
-  result.hour        = (u8)st.wHour;
-  result.minute      = (u8)st.wMinute;
-  result.second      = (u8)st.wSecond;
-  result.millisecond = st.wMilliseconds;
+  String8 result = string8_from_format(arena, "%04u-%.*s-%02u %02u:%02u:%02u.%03u",
+    dt.year, month_name.size, month_name.str, dt.day,dt.hour, dt.minute, dt.second, dt.millisecond);
+                             
   return result;
 }
 
 function OS_Timer
 os_timer_start()
 {
-  OS_Timer timer = {0};
-  OS_Win32_Timer *win32_timer = (OS_Win32_Timer *)timer.opaque;
-  
-  QueryPerformanceFrequency(&win32_timer->frequency);
-  QueryPerformanceCounter(&win32_timer->start_counter);
+  OS_Timer timer;
+  QueryPerformanceCounter((LARGE_INTEGER*)&timer.opaque[0]);
   return timer;
 }
 
-function OS_Time
-os_timer_elapsed(OS_Timer *timer)
+function u64
+os_timer_microseconds(OS_Timer *timer)
 {
-  OS_Win32_Timer *win32_timer = (OS_Win32_Timer *)timer->opaque;
-  LARGE_INTEGER current_counter;
-  QueryPerformanceCounter(&current_counter);
-  
-  OS_Time result = {0};
-  LARGE_INTEGER elapsed = {current_counter.QuadPart - win32_timer->start_counter.QuadPart};
-  result.microseconds   = (elapsed.QuadPart * 1000000) / win32_timer->frequency.QuadPart;
-  return result;
+  LARGE_INTEGER now;
+  QueryPerformanceCounter(&now);
+  u64 start = timer->opaque[0];
+  return ((now.QuadPart - start) * 1000000) / g_win32_performance_frequency.QuadPart;
 }
 
+function u64
+os_timer_milliseconds(OS_Timer *timer)
+{
+  LARGE_INTEGER now;
+  QueryPerformanceCounter(&now);
+  u64 start = timer->opaque[0];
+  return ((now.QuadPart - start) * 1000) / g_win32_performance_frequency.QuadPart;
+}
+
+function f64
+os_timer_seconds(OS_Timer *timer)
+{
+  LARGE_INTEGER now;
+  QueryPerformanceCounter(&now);
+  u64 start = timer->opaque[0];
+  return (f64)(now.QuadPart - start) / (f64)g_win32_performance_frequency.QuadPart;
+}
+
+function void
+os_timer_reset(OS_Timer *timer)
+{
+  QueryPerformanceCounter((LARGE_INTEGER*)&timer->opaque[0]);
+}

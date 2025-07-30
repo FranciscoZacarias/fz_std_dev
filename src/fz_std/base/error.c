@@ -65,12 +65,15 @@ log_emit(Log_Level level, String8 message, String8 file, u32 line)
       default:                level_str = S("UNKNOWN"); break;
     }
     
-    OS_Date_Time date = log_entry_node->value.timestamp;
-    String8 log_line = string8_from_format(g_log_context.arena, 
-      "%s :: %02d-%02d-%02d %02d:%02d:%02d :: %.*s:%u:\n%.*s\n", 
-      level_str.str, date.year, date.month, date.day, date.hour, date.minute, date.second, (s32)file.size, file.str, line, (s32)message.size, message.str);
-    os_file_append(g_log_context.log_file_path, log_line.str, log_line.size);
-    os_console_write(log_line);
+    String8 start = string8_from_format(scratch.arena, "%.*s :: ", level_str.size, level_str.str); 
+    String8 mid   = os_datetime_to_string8(scratch.arena, log_entry_node->value.timestamp);
+    String8 end   = string8_from_format(scratch.arena, " :: %.*s:%u: %.*s\n", (s32)file.size, file.str, line, (s32)message.size, message.str);
+    
+    String8 a = string8_concat(scratch.arena, start, mid);
+    String8 b = string8_concat(scratch.arena, a, end);
+
+    os_file_append(g_log_context.log_file_path, b.str, b.size);
+    os_console_write(b);
   }
   scratch_end(&scratch);
   if (level == Log_Level_Fatal)

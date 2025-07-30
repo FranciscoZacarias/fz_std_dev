@@ -358,12 +358,6 @@ struct OS_Timer
   u64 opaque[2];
 };
 
-typedef struct OS_Time OS_Time;
-struct OS_Time
-{
-  u64 microseconds;
-};
-
 typedef struct OS_Date_Time OS_Date_Time;
 struct OS_Date_Time
 {
@@ -372,27 +366,28 @@ struct OS_Date_Time
   u16 millisecond;
 };
 
-function void         os_time_init();                          /* Initializes timer module */
-function OS_Time      os_time_now_microseconds();              /* Returns time since boot is microseconds */
-function u64          os_get_epoch_microseconds();             /* Returns wall clock time since unix epoch (1970-01-01) */
-function OS_Date_Time os_datetime_now();                       /*  */
-function f64          os_time_in_seconds(OS_Time time);        /*  */
-function f64          os_time_in_milliseconds(OS_Time time);   /*  */
-function u64          os_time_in_microseconds(OS_Time time);   /*  */
-function OS_Time      os_time_diff(OS_Time start, OS_Time end);/*  */
+function void         os_time_init();                                          /* Initializes timer module */
+function u64          os_time_microseconds();                                  /* Time since boot in microseconds */
+function u64          os_time_milliseconds();                                  /* Time since boot in milliseconds */
+function f64          os_time_seconds();                                       /* Time since boot in seconds */
+function u64          os_get_epoch_microseconds();                             /* Wall clock time since unix epoch (1970-01-01) in microseconds */
+function OS_Date_Time os_datetime_now();                                       /* Current local date and time */
+function String8      os_datetime_to_string8(Arena* arena, OS_Date_Time date); /* Returns a verbose datetime string */
 
-function OS_Timer os_timer_start();                  /* Returns a started timer */
-function OS_Time  os_timer_elapsed(OS_Timer *timer); /* Returns a started timer's elapsed time */
-function void     os_timer_reset(OS_Timer *timer);   /* Resets a timer */
+function OS_Timer os_timer_start();                       /* Returns a started timer */
+function u64      os_timer_microseconds(OS_Timer *timer); /* Returns timer's elapsed time in microseconds */
+function u64      os_timer_milliseconds(OS_Timer *timer); /* Returns timer's elapsed time in milliseconds */
+function f64      os_timer_seconds(OS_Timer *timer);      /* Returns timer's elapsed time in seconds */
+function void     os_timer_reset(OS_Timer *timer);        /* Resets a timer */
 
 ///////////////////////////////////////////////////////
 // @Section: Frame Info
 typedef struct OS_Frame_Info OS_Frame_Info;
 struct OS_Frame_Info
 {
-  OS_Time frame_start; /* absolute time at the start of this frame */
-  OS_Time frame_time;  /* delta between current and previous frame start */
-  u64     frame_count; /* how many frames have passed */
+  u64 frame_start; /* absolute time at the start of this frame */
+  u64 frame_time;  /* delta between current and previous frame start */
+  u64 frame_count; /* how many frames have passed */
 };
 
 global OS_Frame_Info g_os_frame_info_previous = {0};
