@@ -129,6 +129,12 @@ os_opengl_end()
   wglDeleteContext(g_os_window_win32.rendering_context);
 }
 
+function void
+os_window_enable_vsync(b32 state)
+{
+  wglSwapIntervalEXT(state);
+}
+
 function b32
 _win32_load_wgl_functions()
 {

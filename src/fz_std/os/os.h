@@ -62,24 +62,6 @@ function void            os_memory_release(void *ptr, u64 size);  /* Releases pr
 function u64             os_memory_get_page_size();               /* Returns the operating system's memory page size */
 
 ///////////////////////////////////////////////////////
-// @Section: Time
-typedef struct PerformanceTimer
-{
-  u64 start_ticks;
-  u64 end_ticks;
-  f32 elapsed_seconds;
-} Performance_Timer;
-
-function void os_timer_init();                          /* Initializes performance timing */
-function void os_timer_start(Performance_Timer* timer); /* Starts the given timer */
-function void os_timer_end(Performance_Timer* timer);   /* Stops the timer and calculates elapsed time */
-function f32  os_get_elapsed_time();                    /* Returns time elapsed since program started */
-function f32  os_get_frame_time();                      /* Returns time elapsed since last frame */
-
-function u64  os_now_microseconds();                    /* High-resolution time */
-function u64  os_now_milliseconds();                    /* Time in milliseconds */
-
-///////////////////////////////////////////////////////
 // @Section: Console
 function b32     os_console_init();                           /* Initializes the console (allocates or attaches on Windows, no-op on Unix) */
 function void    os_console_write(String8 string);            /* Writes a UTF-8 string to the console without a newline */
@@ -374,9 +356,6 @@ function void entry_point(Command_Line* command_line); /* Application entry poin
 // @Section: Globals
 
 global b32 g_is_program_running = true;
-
-global Performance_Timer g_timer_frame_time   = {0};
-global Performance_Timer g_timer_elapsed_time = {0};
 
 ///////////////////////////////////////////////////////
 // @Section: Window

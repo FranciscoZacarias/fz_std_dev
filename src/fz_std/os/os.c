@@ -11,4 +11,3 @@
 #else
 # error OS core layer not implemented for this operating system.
 #endif
-

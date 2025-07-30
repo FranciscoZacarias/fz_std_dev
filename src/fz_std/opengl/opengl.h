@@ -23,6 +23,10 @@ function b32  os_opengl_init(); /* Initializes opengl context */
 function void os_opengl_end();  /* Deletes opengl context */
 
 ///////////////////////////////////////////////////////
+// @Section: Settings
+function void os_window_enable_vsync(b32 state); /* Enables vsync */
+
+///////////////////////////////////////////////////////
 // @Section: Opengl helpers
 function void  APIENTRY _os_opengl_debug_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *user); /* Opengl debug callback */
 function void*          _load_gl_function(const char *name);                                                                                                        /* Helper to load a single opengl function */

@@ -14,7 +14,7 @@ entry_point(Command_Line* command_line)
   os_opengl_init();
   os_window_open();
 
-  wglSwapIntervalEXT(1);
+  os_window_enable_vsync(true);
   while(os_is_application_running())
   {
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);

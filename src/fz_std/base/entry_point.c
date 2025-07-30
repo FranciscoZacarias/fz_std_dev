@@ -3,14 +3,15 @@ main_thread_base_entry_point(int argc, char **argv)
 {
   Scratch scratch = scratch_begin(0, 0);
 
-  // Setup error system
+  // Setup log system
   {
-    String8 error_log_path = os_executable_path(scratch.arena);
-    error_log_path = os_directory_pop(error_log_path);
-    error_init(error_log_path);
+    String8 log_path = os_executable_path(scratch.arena);
+    log_path = os_directory_pop(log_path); // Pop the applicatin.exe file
+    log_path = os_directory_pop(log_path); // Pop from build directory
+    log_init(log_path);
+    emit_info(S(">>>> Entry point <<<<"));
   }
 
-  os_timer_init();
   Command_Line cmd_line = command_line_parse_from_argc_argv(argc, argv);
   entry_point(&cmd_line);
   scratch_end(&scratch);

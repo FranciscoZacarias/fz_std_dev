@@ -3,18 +3,18 @@
 
 typedef enum
 {
-  Error_Level_Info = 0,
-  Error_Level_Warning,
-  Error_Level_Error,
-  Error_Level_Fatal,
+  Log_Level_Info = 0,
+  Log_Level_Warning,
+  Log_Level_Error,
+  Log_Level_Fatal,
 
-  Error_Level_Count
-} Error_Level;
+  Log_Level_Count
+} Log_Level;
 
-typedef struct Error_Entry Error_Entry;
-struct Error_Entry
+typedef struct Log_Entry Log_Entry;
+struct Log_Entry
 {
-  Error_Level level;
+  Log_Level level;
   String8 message;
 
   String8 file;
@@ -23,31 +23,31 @@ struct Error_Entry
 };
 
 #define MAX_ERROR_NODES 128
-typedef struct Error_Entry_Node Error_Entry_Node;
-struct Error_Entry_Node
+typedef struct Log_Entry_Node Log_Entry_Node;
+struct Log_Entry_Node
 {
-  Error_Entry_Node* next;
-  Error_Entry value;
+  Log_Entry_Node* next;
+  Log_Entry value;
 };
 
-typedef struct Error_Context Error_Context;
-struct Error_Context
+typedef struct Log_Context Log_Context;
+struct Log_Context
 {
   Arena* arena;
-  Error_Entry_Node* error_entry_first;
-  Error_Entry_Node* error_entry_last;
-  u32 error_count;
+  Log_Entry_Node* log_entry_first;
+  Log_Entry_Node* log_entry_last;
+  u32 log_count;
   String8 log_file_path;
 };
 
-global Error_Context g_error_context = {0};
+global Log_Context g_log_context = {0};
 
-function void error_init(String8 error_log_path);
-function void error_emit(Error_Level level, String8 message, String8 file, u32 line);
+function void log_init(String8 error_log_path);
+function void log_emit(Log_Level level, String8 message, String8 file, u32 line);
 
-#define emit_info(str8_msg)  error_emit(Error_Level_Info,   str8_msg, S(__FILE__), __LINE__)
-#define emit_warn(str8_msg)  error_emit(Error_Level_Warning,str8_msg, S(__FILE__), __LINE__)
-#define emit_error(str8_msg) error_emit(Error_Level_Error,  str8_msg, S(__FILE__), __LINE__)
-#define emit_fatal(str8_msg) error_emit(Error_Level_Fatal,  str8_msg, S(__FILE__), __LINE__)
+#define emit_info(str8_msg)  log_emit(Log_Level_Info,   str8_msg, S(__FILE__), __LINE__)
+#define emit_warn(str8_msg)  log_emit(Log_Level_Warning,str8_msg, S(__FILE__), __LINE__)
+#define emit_error(str8_msg) log_emit(Log_Level_Error,  str8_msg, S(__FILE__), __LINE__)
+#define emit_fatal(str8_msg) log_emit(Log_Level_Fatal,  str8_msg, S(__FILE__), __LINE__)
 
 #endif // ERROR_H

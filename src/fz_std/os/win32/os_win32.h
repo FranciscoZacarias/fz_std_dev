@@ -40,6 +40,4 @@ extern char** __argv;
 global HINSTANCE _hInstance            = NULL;
 global WPARAM    _ApplicationReturn    = 0;
 
-global LARGE_INTEGER win32_performance_frequency;
-
 #endif // OS_CORE_WIN32_H

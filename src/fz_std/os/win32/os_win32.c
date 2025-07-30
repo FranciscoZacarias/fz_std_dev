@@ -113,70 +113,6 @@ os_memory_get_page_size()
 }
 
 ///////////////////////////////////////////////////////
-// @Section: Time
-function void
-os_timer_init()
-{
-  QueryPerformanceFrequency(&win32_performance_frequency);
-  os_timer_start(&g_timer_elapsed_time);
-  os_timer_start(&g_timer_frame_time);
-}
-
-function void
-os_timer_start(Performance_Timer* timer)
-{
-  LARGE_INTEGER counter;
-  QueryPerformanceCounter(&counter);
-  timer->start_ticks = (u64)counter.QuadPart;
-  timer->end_ticks = 0;
-  timer->elapsed_seconds = 0.0f;
-}
-
-function void
-os_timer_end(Performance_Timer* timer)
-{
-  LARGE_INTEGER counter;
-  QueryPerformanceCounter(&counter);
-  timer->end_ticks = (u64)counter.QuadPart;
-  u64 delta = timer->end_ticks - timer->start_ticks;
-  timer->elapsed_seconds = (f32)((f64)delta / (f64)win32_performance_frequency.QuadPart);
-}
-
-function f32
-os_get_elapsed_time()
-{
-  LARGE_INTEGER current;
-  QueryPerformanceCounter(&current);
-  u64 delta = (u64)current.QuadPart - g_timer_elapsed_time.start_ticks;
-  return (f32)((f64)delta / (f64)win32_performance_frequency.QuadPart);
-}
-
-function f32
-os_get_frame_time()
-{
-  LARGE_INTEGER current;
-  QueryPerformanceCounter(&current);
-  u64 delta = (u64)current.QuadPart - g_timer_frame_time.start_ticks;
-  return (f32)((f64)delta / (f64)win32_performance_frequency.QuadPart);
-}
-
-function u64
-os_now_microseconds(void)
-{
-  LARGE_INTEGER counter;
-  QueryPerformanceCounter(&counter);
-
-  u64 result = (counter.QuadPart * 1000000ULL) / win32_performance_frequency.QuadPart;
-  return result;
-}
-
-function u64
-os_now_milliseconds()
-{
-  return os_now_microseconds() / (u64)1000;
-}
-
-///////////////////////////////////////////////////////
 // @Section: Console
 function b32
 os_console_init()
@@ -217,7 +153,7 @@ os_console_init()
 function void
 os_console_write(String8 string)
 {
-
+  printf("%.*s", (s32)string.size, string.str);
 }
 
 function void
@@ -261,29 +197,35 @@ os_console_has_input()
 function b32
 os_file_create(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  HANDLE file = CreateFileW(wpath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+  Scratch scratch = scratch_begin(0,0);
+  u8* cpath = cstring_from_string8(scratch.arena, path);
+  HANDLE file = CreateFileA(cpath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
   b32 result = (file != INVALID_HANDLE_VALUE);
   if(result)
   {
     CloseHandle(file);
   }
+  scratch_end(&scratch);
   return result;
 }
 
 function b32
 os_file_delete(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  b32 result = DeleteFileW(wpath);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  b32 result = DeleteFileA(cpath);
+  scratch_end(&scratch);
   return result;
 }
 
 function b32
 os_file_exists(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  DWORD attr = GetFileAttributesW(wpath);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  DWORD attr = GetFileAttributesA(cpath);
+  scratch_end(&scratch);
   b32 result = (attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY));
   return result;
 }
@@ -291,12 +233,16 @@ os_file_exists(String8 path)
 function u32
 os_file_overwrite(String8 path, u8* data, u64 data_size)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  HANDLE file = CreateFileW(wpath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  HANDLE file = CreateFileA(cpath, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+  scratch_end(&scratch);
+
   if(file == INVALID_HANDLE_VALUE)
   {
     return 0;
   }
+
   DWORD written = 0;
   WriteFile(file, data, (DWORD)data_size, &written, 0);
   CloseHandle(file);
@@ -306,12 +252,16 @@ os_file_overwrite(String8 path, u8* data, u64 data_size)
 function u32
 os_file_append(String8 path, u8* data, u64 data_size)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  HANDLE file = CreateFileW(wpath, FILE_APPEND_DATA, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  HANDLE file = CreateFileA(cpath, FILE_APPEND_DATA, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+  scratch_end(&scratch);
+
   if(file == INVALID_HANDLE_VALUE)
   {
     return 0;
   }
+
   SetFilePointer(file, 0, 0, FILE_END);
   DWORD written = 0;
   WriteFile(file, data, (DWORD)data_size, &written, 0);
@@ -322,14 +272,16 @@ os_file_append(String8 path, u8* data, u64 data_size)
 function b32
 os_file_wipe(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  HANDLE file = CreateFileW(wpath, GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  HANDLE file = CreateFileA(cpath, GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  scratch_end(&scratch);
+
   if(file == INVALID_HANDLE_VALUE)
   {
     return 0;
   }
 
-  // Truncate by setting file pointer to start and calling SetEndOfFile
   SetFilePointer(file, 0, 0, FILE_BEGIN);
   b32 result = SetEndOfFile(file);
   CloseHandle(file);
@@ -339,12 +291,17 @@ os_file_wipe(String8 path)
 function u32
 os_file_size(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
   WIN32_FILE_ATTRIBUTE_DATA attr;
-  if(!GetFileAttributesExW(wpath, GetFileExInfoStandard, &attr))
+  b32 ok = GetFileAttributesExA(cpath, GetFileExInfoStandard, &attr);
+  scratch_end(&scratch);
+
+  if(!ok)
   {
     return 0;
   }
+
   ULARGE_INTEGER size;
   size.LowPart = attr.nFileSizeLow;
   size.HighPart = attr.nFileSizeHigh;
@@ -355,8 +312,12 @@ function File_Data
 os_file_load(Arena* arena, String8 path)
 {
   File_Data result = {0};
-  wchar_t *wpath = wchar_from_string8(path);
-  HANDLE file = CreateFileW(wpath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  HANDLE file = CreateFileA(cpath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  scratch_end(&scratch);
+
   if(file == INVALID_HANDLE_VALUE)
   {
     return result;
@@ -376,24 +337,14 @@ os_file_load(Arena* arena, String8 path)
   return result;
 }
 
-function b32
-os_file_has_extension(String8 filename, String8 ext)
-{
-  if(filename.size < ext.size + 1)
-  {
-    return 0;
-  }
-
-  String8 slice = string8_slice(filename, filename.size - ext.size, filename.size);
-  b32 result = string8_match(slice, ext, true);
-  return result;
-}
-
 function u64
 os_file_get_last_modified_time(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  HANDLE file = CreateFileW(wpath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  HANDLE file = CreateFileA(cpath, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  scratch_end(&scratch);
+
   if(file == INVALID_HANDLE_VALUE)
   {
     return 0;
@@ -416,30 +367,37 @@ os_file_get_last_modified_time(String8 path)
 
 ///////////////////////////////////////////////////////
 // @Section: Directories
-function b32      
+
+function b32
 os_directory_create(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  b32 result = CreateDirectoryW(wpath, 0);
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  b32 result = CreateDirectoryA(cpath, 0);
   b32 exists = (GetLastError() == ERROR_ALREADY_EXISTS);
+  scratch_end(&scratch);
   return result || exists;
 }
 
-function b32  
+function b32
 os_directory_delete(String8 path)
 {
-  wchar_t *wpath = wchar_from_string8(path);
-  b32 success = RemoveDirectoryW(wpath);
-  return success;
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *cpath = cstring_from_string8(scratch.arena, path);
+  b32 result = RemoveDirectoryA(cpath);
+  scratch_end(&scratch);
+  return result;
 }
 
-function b32  
+function b32
 os_directory_move(String8 path, String8 destination)
 {
-  wchar_t *wsrc = wchar_from_string8(path);
-  wchar_t *wdst = wchar_from_string8(destination);
-  b32 success = MoveFileW(wsrc, wdst);
-  return success;
+  Scratch scratch = scratch_begin(0, 0);
+  u8 *csrc = cstring_from_string8(scratch.arena, path);
+  u8 *cdst = cstring_from_string8(scratch.arena, destination);
+  b32 result = MoveFileA(csrc, cdst);
+  scratch_end(&scratch);
+  return result;
 }
 
 function String8  
