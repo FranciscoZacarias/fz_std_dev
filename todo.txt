@@ -5,4 +5,4 @@
 [ ] join fz_opengl with fz_window and use some flag to enable the api. realistically, i wont use the window without a graphics api.
 [x] add vsync control
 [x] fix default log_path_file
-[ ] change windows functions from Wide to ANSI
+[x] change windows functions from Wide to ANSI

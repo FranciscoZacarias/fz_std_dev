@@ -14,11 +14,6 @@
 #pragma comment(lib, "advapi32")
 
 ///////////////////////////////////////////////////////
-// @Section: Strings
-function wchar_t* wchar_from_string8(String8 path);                /* Converts string8 to wide char array (16bit cstring) */
-function String8  string8_from_wchar(Arena* arena, wchar_t* wstr); /* Converts a wide char array to a String */
-
-///////////////////////////////////////////////////////
 // @Section: Error handling
 function LONG WINAPI win32_exception_filter(EXCEPTION_POINTERS* exception_ptrs); /* Win32 exception filer for SetUnhandledExceptionFilter */
 function void _win32_output_last_error(DWORD error);
