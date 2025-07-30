@@ -6,7 +6,7 @@ typedef struct Thread_Context {
 } Thread_Context;
 
 C_LINKAGE thread_static Thread_Context* ThreadContextThreadLocal = 0;
-global Thread_Context MainThreadContext;
+global Thread_Context g_main_thread_context;
 
 function void            thread_context_init_and_attach(Thread_Context* thread_context);
 function void            thread_context_free();

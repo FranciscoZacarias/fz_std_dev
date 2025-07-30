@@ -28,7 +28,7 @@ function void _win32_output_last_error(DWORD error);
 // @Section: Modern Windows SDK functions
 // rfj: We must dynamically link to them, since they can be missing in older SDKs
 typedef HRESULT W32_SetThreadDescription_Type(HANDLE hThread, PCWSTR lpThreadDescription);
-global W32_SetThreadDescription_Type *w32_SetThreadDescription_func = 0;
+global W32_SetThreadDescription_Type *g_win32_set_thread_description_func = 0;
 
 ///////////////////////////////////////////////////////
 // @Section: Extern
@@ -37,7 +37,7 @@ extern char** __argv;
 
 ///////////////////////////////////////////////////////
 // @Section: Win32 Globals
-global HINSTANCE _hInstance            = NULL;
-global WPARAM    _ApplicationReturn    = 0;
+global HINSTANCE _g_hInstance          = NULL;
+global WPARAM    _g_application_return = 0;
 
 #endif // OS_CORE_WIN32_H

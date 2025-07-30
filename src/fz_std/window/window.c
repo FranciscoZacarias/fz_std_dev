@@ -4,47 +4,47 @@ function void
 _input_init()
 {
   AssertNoReentry();
-  MemoryZeroStruct(&_InputState);
+  MemoryZeroStruct(&_g_input_state);
 
-  _InputState.mouse_current.screen_space.x = g_os_window.dimensions.x/2;
-  _InputState.mouse_current.screen_space.y = g_os_window.dimensions.y/2;
+  _g_input_state.mouse_current.screen_space.x = g_os_window.dimensions.x/2;
+  _g_input_state.mouse_current.screen_space.y = g_os_window.dimensions.y/2;
   
-  _InputState.mouse_previous.screen_space.x = g_os_window.dimensions.x/2;
-  _InputState.mouse_previous.screen_space.y = g_os_window.dimensions.y/2;
+  _g_input_state.mouse_previous.screen_space.x = g_os_window.dimensions.x/2;
+  _g_input_state.mouse_previous.screen_space.y = g_os_window.dimensions.y/2;
 }
 
 function void
 _input_update()
 {
-  MemoryCopy(&_InputState.keyboard_previous, &_InputState.keyboard_current, sizeof(Keyboard_State));
-  MemoryCopy(&_InputState.mouse_previous,    &_InputState.mouse_current,    sizeof(Mouse_State));
+  MemoryCopy(&_g_input_state.keyboard_previous, &_g_input_state.keyboard_current, sizeof(Keyboard_State));
+  MemoryCopy(&_g_input_state.mouse_previous,    &_g_input_state.mouse_current,    sizeof(Mouse_State));
 }
 
 function b32
 input_is_key_up(Keyboard_Key key)
 {
-  b32 result = _InputState.keyboard_current.keys[key] == false;
+  b32 result = _g_input_state.keyboard_current.keys[key] == false;
   return result;
 }
 
 function b32
 input_is_key_down(Keyboard_Key key)
 {
-  b32 result = _InputState.keyboard_current.keys[key] == true;
+  b32 result = _g_input_state.keyboard_current.keys[key] == true;
   return result;
 }
 
 function b32
 input_was_key_up(Keyboard_Key key)
 {
-  b32 result = _InputState.keyboard_previous.keys[key] == false;
+  b32 result = _g_input_state.keyboard_previous.keys[key] == false;
   return result;
 }
 
 function b32
 input_was_key_down(Keyboard_Key key)
 {
-  b32 result = _InputState.keyboard_previous.keys[key] == true;
+  b32 result = _g_input_state.keyboard_previous.keys[key] == true;
   return result;
 }
 
@@ -57,37 +57,37 @@ input_is_key_pressed(Keyboard_Key key)
 function void
 _input_process_keyboard_key(Keyboard_Key key, b8 is_pressed)
 {
-  if (_InputState.keyboard_current.keys[key] != is_pressed)
+  if (_g_input_state.keyboard_current.keys[key] != is_pressed)
   {
-    _InputState.keyboard_current.keys[key] = is_pressed;
+    _g_input_state.keyboard_current.keys[key] = is_pressed;
   }
 }
 
 function b32
 input_is_button_up(Mouse_Button button)
 {
-  b32 result = _InputState.mouse_current.buttons[button] == false;
+  b32 result = _g_input_state.mouse_current.buttons[button] == false;
   return result;
 }
 
 function b32
 input_is_button_down(Mouse_Button button)
 {
-  b32 result = _InputState.mouse_current.buttons[button] == true;
+  b32 result = _g_input_state.mouse_current.buttons[button] == true;
   return result;
 }
 
 function b32
 input_was_button_up(Mouse_Button button)
 {
-  b32 result = _InputState.mouse_previous.buttons[button] == false;
+  b32 result = _g_input_state.mouse_previous.buttons[button] == false;
   return result;
 }
 
 function b32
 input_was_button_down(Mouse_Button button)
 {
-  b32 result = _InputState.mouse_previous.buttons[button] == true;
+  b32 result = _g_input_state.mouse_previous.buttons[button] == true;
   return result;
 }
 
@@ -101,9 +101,9 @@ input_is_button_pressed(Mouse_Button button)
 function void
 _input_process_mouse_button(Mouse_Button button, b32 is_pressed)
 {
-  if (_InputState.mouse_current.buttons[button] != (b8)is_pressed)
+  if (_g_input_state.mouse_current.buttons[button] != (b8)is_pressed)
   {
-    _InputState.mouse_current.buttons[button] = (b8)is_pressed;
+    _g_input_state.mouse_current.buttons[button] = (b8)is_pressed;
   }
 }
 
@@ -111,13 +111,13 @@ function void
 _input_process_mouse_cursor(s32 x, s32 y)
 {
   // Copy current state to previous
-  MemoryCopyStruct(&(_InputState.mouse_previous), &(_InputState.mouse_current));
+  MemoryCopyStruct(&(_g_input_state.mouse_previous), &(_g_input_state.mouse_current));
 
   // Compute new deltas
-  _InputState.mouse_current.delta.x = x - _InputState.mouse_previous.screen_space.x;
-  _InputState.mouse_current.delta.y = y - _InputState.mouse_previous.screen_space.y;
+  _g_input_state.mouse_current.delta.x = x - _g_input_state.mouse_previous.screen_space.x;
+  _g_input_state.mouse_current.delta.y = y - _g_input_state.mouse_previous.screen_space.y;
 
   // Update current position
-  _InputState.mouse_current.screen_space.x = x;
-  _InputState.mouse_current.screen_space.y = y;
+  _g_input_state.mouse_current.screen_space.x = x;
+  _g_input_state.mouse_current.screen_space.y = y;
 }

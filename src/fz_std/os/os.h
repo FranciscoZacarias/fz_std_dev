@@ -301,10 +301,10 @@ typedef struct Input_State
   Mouse_State   mouse_previous;
 } Input_State;
 
-global Input_State _InputState;
+global Input_State _g_input_state;
 
-global b32 _IgnoreNextMouseMove = false;
-global b32 _IsCursorLocked      = false;
+global b32 _g_ignore_next_mouse_move = false;
+global b32 _g_is_cursor_locked       = false;
 
 function void _input_init();   /* Initializes input state (clears previous + current states) */
 function void _input_update(); /* Updates previous input state with current state (to track deltas and transitions) */
@@ -360,7 +360,7 @@ global b32 g_is_program_running = true;
 ///////////////////////////////////////////////////////
 // @Section: Window
 typedef void (*WindowResizeCallback)(s32 width, s32 height);
-global WindowResizeCallback os_resize_callback;
+global WindowResizeCallback g_os_resize_callback;
 
 ///////////////////////////////////////////////////////
 // @Section: OS-Dependent headers

@@ -67,19 +67,19 @@ os_cursor_lock(b32 lock)
     ClientToScreen(g_os_window_win32.window_handle, &center);
     SetCursorPos(center.x, center.y);
 
-    _IsCursorLocked      = true;
-    _IgnoreNextMouseMove = true;
+    _g_ignore_next_mouse_move = true;
+    _g_is_cursor_locked       = true;
 
     // Reset deltas to avoid cursor jump
-    _InputState.mouse_current.delta.x  = 0.0f;
-    _InputState.mouse_current.delta.y  = 0.0f;
-    _InputState.mouse_previous.delta.x = 0.0f;
-    _InputState.mouse_previous.delta.y = 0.0f;
-    MemoryCopyStruct(&_InputState.mouse_previous, &_InputState.mouse_current);
+    _g_input_state.mouse_current.delta.x  = 0.0f;
+    _g_input_state.mouse_current.delta.y  = 0.0f;
+    _g_input_state.mouse_previous.delta.x = 0.0f;
+    _g_input_state.mouse_previous.delta.y = 0.0f;
+    MemoryCopyStruct(&_g_input_state.mouse_previous, &_g_input_state.mouse_current);
   }
   else
   {
-    _IsCursorLocked = false;
+    _g_is_cursor_locked = false;
   }
 }
 
@@ -255,7 +255,7 @@ os_window_init(s32 width, s32 height, String8 title)
   MemoryZeroStruct(&g_os_window_win32);
   b32 result = true;
 
-  g_os_window_win32.window_handle = _win32_window_create(_hInstance, width, height, title);
+  g_os_window_win32.window_handle = _win32_window_create(_g_hInstance, width, height, title);
   if (!IsWindow(g_os_window_win32.window_handle))
   {
     win32_check_error();
@@ -273,7 +273,7 @@ os_window_init(s32 width, s32 height, String8 title)
   g_os_window_win32.state.title      = S("FZ_Window_Title");
   
   _input_init();
-  os_resize_callback = _win32_window_resize_callback;
+  g_os_resize_callback = _win32_window_resize_callback;
 
   return result;
 }
@@ -305,7 +305,7 @@ os_is_application_running()
     {
       if (msg.message == WM_QUIT) 
       {
-        _ApplicationReturn = (s32)msg.wParam;
+        _g_application_return = (s32)msg.wParam;
         return false;
       }
       TranslateMessage(&msg);
@@ -482,7 +482,7 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_SIZE: 
     {
-      os_resize_callback(LOWORD(lParam), HIWORD(lParam));
+      g_os_resize_callback(LOWORD(lParam), HIWORD(lParam));
       return 0;
     }
     break;
@@ -520,9 +520,9 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     // Mouse Cursor
     case WM_MOUSEMOVE: 
     {
-      if (_IgnoreNextMouseMove) 
+      if (_g_ignore_next_mouse_move) 
       {
-        _IgnoreNextMouseMove = false;
+        _g_ignore_next_mouse_move = false;
         return 0;
       }
       s32 x = LOWORD(lParam);

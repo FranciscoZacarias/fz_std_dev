@@ -1,4 +1,4 @@
-[ ] clean global variable names
+[x] clean global variable names
 [ ] clean typedef to forward declare first
 [ ] figure out frame time, delta time, elapsed time
 [ ] make a smooth glclearcolor transition as example

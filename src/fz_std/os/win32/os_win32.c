@@ -497,12 +497,12 @@ int WINAPI
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
 {
   SetUnhandledExceptionFilter(&win32_exception_filter);
-  _hInstance = hInstance;
+  _g_hInstance = hInstance;
 
   // Dynamically load windows functions which are not guaranteed in all SDKs
   {
     HMODULE module = LoadLibraryA("kernel32.dll");
-    w32_SetThreadDescription_func = (W32_SetThreadDescription_Type *)GetProcAddress(module, "SetThreadDescription");
+    g_win32_set_thread_description_func = (W32_SetThreadDescription_Type *)GetProcAddress(module, "SetThreadDescription");
     FreeLibrary(module);
   }
 
@@ -510,7 +510,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
   thread_context_init_and_attach(&thread_context);
 
   main_thread_base_entry_point(__argc, __argv);
-  return _ApplicationReturn;
+  return _g_application_return;
 }
 
 ///////////////////////////////////////////////////////

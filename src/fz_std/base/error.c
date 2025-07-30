@@ -65,7 +65,7 @@ log_emit(Log_Level level, String8 message, String8 file, u32 line)
       default:                level_str = S("UNKNOWN"); break;
     }
     
-    String8 datetime = S("00-00-0000 00:00:00");
+    String8 datetime = S("00-00-0000 00:00:00"); // TODO(fz): Replace with actual date time
     String8 log_line = string8_from_format(g_log_context.arena, "%s :: %.*s :: %.*s:%u:\n%.*s\n", level_str.str, (s32)datetime.size, datetime.str, (s32)file.size, file.str, line, (s32)message.size, message.str);
     os_file_append(g_log_context.log_file_path, log_line.str, log_line.size);
     os_console_write(log_line);
