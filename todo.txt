@@ -1,5 +1,5 @@
 [x] clean global variable names
-[ ] clean typedef to forward declare first
+[x] clean typedef to forward declare first
 [ ] figure out frame time, delta time, elapsed time
 [ ] make a smooth glclearcolor transition as example
 [ ] join fz_opengl with fz_window and use some flag to enable the api. realistically, i wont use the window without a graphics api.

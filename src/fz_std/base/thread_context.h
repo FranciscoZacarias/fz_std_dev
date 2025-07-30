@@ -1,9 +1,10 @@
 #ifndef THREAD_CONTEXT_H
 #define THREAD_CONTEXT_H
 
-typedef struct Thread_Context {
+typedef struct Thread_Context Thread_Context;
+struct Thread_Context {
   Arena* arenas[2];
-} Thread_Context;
+};
 
 C_LINKAGE thread_static Thread_Context* ThreadContextThreadLocal = 0;
 global Thread_Context g_main_thread_context;

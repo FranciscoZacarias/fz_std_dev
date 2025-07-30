@@ -5,11 +5,12 @@
 
 ///////////////////////////////////////////////////////
 // @Section: Window
-typedef struct OS_Window
+typedef struct OS_Window OS_Window;
+struct OS_Window
 {
   Vec2S32 dimensions;
   String8 title;
-} OS_Window;
+};
 global OS_Window g_os_window;
 
 ///////////////////////////////////////////////////////

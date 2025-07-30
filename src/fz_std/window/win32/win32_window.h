@@ -3,13 +3,14 @@
 
 ///////////////////////////////////////////////////////
 // @Section: Window
-typedef struct OS_Window_Win32
+typedef struct OS_Window_Win32 OS_Window_Win32;
+struct OS_Window_Win32
 {
   OS_Window state;
   HGLRC rendering_context;
   HWND  window_handle;
   HDC   device_context;
-} OS_Window_Win32;
+};
 
 global OS_Window_Win32 g_os_window_win32;
 

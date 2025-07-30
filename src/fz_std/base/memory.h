@@ -8,13 +8,14 @@
 # define ARENA_COMMIT_SIZE Kilobytes(64)
 #endif
 
-typedef struct Arena {
+typedef struct Arena Arena;
+struct Arena {
   u64 reserved;      // Reserved memory
   u64 commited;      // Commited memory
   u64 commit_size;   // Size for each commit on this arena
   u64 position;      // Current position of the arena
   u64 align;         // Arena's memory alignment
-} Arena;
+};
 #define ARENA_HEADER_SIZE AlignPow2(sizeof(Arena), os_memory_get_page_size())
 
 function Arena* arena_alloc();

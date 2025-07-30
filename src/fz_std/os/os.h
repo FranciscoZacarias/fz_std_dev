@@ -3,25 +3,28 @@
 
 ///////////////////////////////////////////////////////
 // @Section: OS Handles
-typedef struct OS_Handle
+typedef struct OS_Handle OS_Handle;
+struct OS_Handle
 {
   u64 v[1];
-} OS_Handle;
+};
 
 ///////////////////////////////////////////////////////
 // @Section: System info
-typedef struct OS_System_Info
+typedef struct OS_System_Info OS_System_Info;
+struct OS_System_Info
 {
   u32 logical_processor_count;
   u64 page_size;
   u64 large_page_size;
   u64 allocation_granularity;
   String8 machine_name;
-} OS_System_Info;
+};
 
 ///////////////////////////////////////////////////////
 // @Section: Process Info
-typedef struct OS_Process_Info
+typedef struct OS_Process_Info OS_Process_Info;
+struct OS_Process_Info
 {
   u32 pid;
   b32 large_pages_allowed;
@@ -30,11 +33,12 @@ typedef struct OS_Process_Info
   String8 user_program_data_path;
   String8_List module_load_paths;
   String8_List environment;
-} OS_Process_Info;
+};
 
 ///////////////////////////////////////////////////////
 // @Section: Process Launch Parameters
-typedef struct OS_Launch_Parameters
+typedef struct OS_Launch_Parameters OS_Launch_Parameters;
+struct OS_Launch_Parameters
 {
   String8_List cmd_line;
   String8 path;
@@ -42,17 +46,18 @@ typedef struct OS_Launch_Parameters
   b32 inherit_env;
   b32 debug_subprocesses;
   b32 consoleless;
-} OS_Launch_Parameters;
+};
 
 ///////////////////////////////////////////////////////
 // @Section: Memory
-typedef struct OS_Memory_Stats
+typedef struct OS_Memory_Stats OS_Memory_Stats;
+struct OS_Memory_Stats
 {
   u64 total_physical;
   u64 available_physical;
   u64 total_virtual;
   u64 used_virtual;
-} OS_Memory_Stats;
+};
 
 function OS_Memory_Stats os_memory_stats();                       /* Returns the current memory usage statistics of the system and process */
 function void*           os_memory_reserve(u64 size);             /* Reserves a block of virtual address space without committing physical memory */
@@ -74,25 +79,28 @@ function b32     os_console_has_input();                      /* Returns true if
 
 ///////////////////////////////////////////////////////
 // @Section: Files
-typedef struct File_Data
+typedef struct File_Data File_Data;
+struct File_Data
 {
   String8 path;
   String8 data;
-} File_Data;
+};
 
-typedef struct File_Node
+typedef struct File_Node File_Node;
+struct File_Node
 {
   struct File_Node* next;
   File_Data value;
-} File_Node;
+};
 
-typedef struct File_List
+typedef struct File_List File_List;
+struct File_List
 {
   File_Node* first;
   File_Node* last;
   u64 node_count;
   u64 total_size;
-} File_List;
+};
 
 function b32       os_file_create(String8 path);                                       /* Creates file. If file exists, returns true anyway. */
 function b32       os_file_delete(String8 path);                                       /* Deletes a file */
@@ -281,25 +289,28 @@ typedef enum Mouse_Button
 } Mouse_Button;
 
 #define KEYBOARD_STATE_SIZE 256
-typedef struct Keyboard_State
+typedef struct Keyboard_State Keyboard_State;
+struct Keyboard_State
 {
   b8 keys[KEYBOARD_STATE_SIZE];
-} Keyboard_State;
+};
 
-typedef struct Mouse_State
+typedef struct Mouse_State Mouse_State;
+struct Mouse_State
 {
   Vec2F32 screen_space;
   Vec2F32 delta;
   b8 buttons[MouseButton_Count];
-} Mouse_State;
+};
 
-typedef struct Input_State
+typedef struct Input_State Input_State;
+struct Input_State
 {
   Keyboard_State keyboard_current;
   Keyboard_State keyboard_previous;
   Mouse_State   mouse_current;
   Mouse_State   mouse_previous;
-} Input_State;
+};
 
 global Input_State _g_input_state;
 
@@ -339,12 +350,13 @@ function void    os_exit_process(u32 code);
 
 ///////////////////////////////////////////////////////
 // @Section: OS Global State
-typedef struct OS_State
+typedef struct OS_State OS_State;
+struct OS_State
 {
   OS_System_Info system_info;
   OS_Process_Info process_info;
   u64 microsecond_resolution;
-} OS_State;
+};
 
 global OS_State g_os_state = {0};
 

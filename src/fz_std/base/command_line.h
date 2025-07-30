@@ -11,20 +11,23 @@
 #define TEMP_BUFFER_SIZE 2048
 #define PARSED_BUFFER_SIZE 4096
 
-typedef struct Command_Line_Arg {
+typedef struct Command_Line_Arg Command_Line_Arg;
+struct Command_Line_Arg {
   b32     is_flag;
   String8 key;
   String8 value;
-} Command_Line_Arg;
+};
 
 function Command_Line_Arg command_line_arg_new(String8 key, String8 value, b32 is_flag);
 
-typedef struct Command_Line {
+typedef struct Command_Line Command_Line;
+struct Command_Line 
+{
   String8 executable;
   String8 raw_args;
   Command_Line_Arg args[MAX_COMMAND_LINE_ARGS];
   u32              args_count;
-} Command_Line;
+};
 
 function Command_Line command_line_parse(String8 input);
 function Command_Line command_line_parse_from_argc_argv(s32 argc, u8** argv);

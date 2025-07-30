@@ -2,23 +2,26 @@
 #define STRING_H
 
 // 8 Bit strings
-typedef struct String8 {
+typedef struct String8 String8;
+struct String8 {
   u64 size;
   u8* str;
-} String8;
+};
 #define S(s) (String8){sizeof(s)-1, (u8*)(s)}
 
-typedef struct String8_Node {
+typedef struct String8_Node String8_Node;
+struct String8_Node {
   struct String8_Node* next;
   String8 value;
-} String8_Node;
+};
 
-typedef struct String8_List {
+typedef struct String8_List String8_List;
+struct String8_List {
   String8_Node* first;
   String8_Node* last;
   u64 node_count;
   u64 total_size;
-} String8_List;
+};
 
 function String8 string8_new(u64 size, u8* str);
 function String8 string8_copy(Arena* arena, String8 source);
