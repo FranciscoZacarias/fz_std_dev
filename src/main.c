@@ -22,9 +22,9 @@ entry_point(Command_Line* command_line)
   os_opengl_init();
   os_window_open();
 
-  float phase = 0.0f;
-  const float speed = 0.05f;
-  const float tau = PI*2;
+  f32 phase = 0.0f;
+  const f32 speed = 0.05f;
+  const f32 tau = PI*2;
 
   os_window_enable_vsync(true);
   while(os_is_application_running())
@@ -33,10 +33,10 @@ entry_point(Command_Line* command_line)
 
     phase += speed;
     if (phase > tau) phase -= tau;
-    float t = (1.0f + cosf(phase)) * 0.5f;
-    float r = (1.0f + cosf(phase)) * 0.5f;
-    float g = (1.0f + cosf(phase - tau/3)) * 0.5f;
-    float b = (1.0f + cosf(phase - 2*tau/3)) * 0.5f;
+    f32 t = (1.0f + cosf(phase)) * 0.5f;
+    f32 r = (1.0f + cosf(phase)) * 0.5f;
+    f32 g = (1.0f + cosf(phase - tau/3)) * 0.5f;
+    f32 b = (1.0f + cosf(phase - 2*tau/3)) * 0.5f;
     glClearColor(r, g, b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
