@@ -1,7 +1,0 @@
-[x] clean global variable names
-[x] clean typedef to forward declare first
-[x] figure out frame time, delta time, elapsed time
-[ ] make a smooth glclearcolor transition as example
-[x] add vsync control
-[x] fix default log_path_file
-[x] change windows functions from Wide to ANSI

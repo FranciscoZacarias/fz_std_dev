@@ -430,9 +430,17 @@ global WindowResizeCallback g_os_resize_callback;
 // @Section: OS-Dependent headers
 
 #if OS_WINDOWS
+// Disable unicode
 # ifdef UNICODE
 # undef UNICODE
 # endif
+// Disable specific warnings when including windows
+# pragma warning(push)
+# pragma warning(disable: 4042) // Avoids known warning from winnls.h
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# pragma warning(pop)
+// win32 header
 # include "os/win32/os_win32.h"
 #elif OS_LINUX
 # include "os/linux/os_linux.h"

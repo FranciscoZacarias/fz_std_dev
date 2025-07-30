@@ -1,12 +1,6 @@
 #ifndef OS_CORE_WIN32_H
 #define OS_CORE_WIN32_H
 
-#pragma warning(push)
-#pragma warning(disable: 4042) // Avoids known warning from winnls.h
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#pragma warning(pop)
-
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "gdi32.lib")
