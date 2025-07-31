@@ -269,7 +269,7 @@ os_window_init(s32 width, s32 height, String8 title)
     emit_error(S("Failed to get device context"));
   }
 
-  g_os_window_win32.state.dimensions = (Vec2S32){width, height};
+  g_os_window_win32.state.dimensions = (Vec2s32){width, height};
   g_os_window_win32.state.title      = S("FZ_Window_Title");
   
   _input_init();
@@ -444,13 +444,13 @@ os_window_push_custom_edges(f32 thickness)
 }
 
 function void
-os_window_push_custom_title_bar_client_area(Range2F32 rect)
+os_window_push_custom_title_bar_client_area(Range2f32 rect)
 {
 
 }
 
 function void
-os_window_set_position(Vec2F32 pos)
+os_window_set_position(Vec2f32 pos)
 {
   SetWindowPos(g_os_window_win32.window_handle, 0,
                (int)pos.x, (int)pos.y, 0, 0,
